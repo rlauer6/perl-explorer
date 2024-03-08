@@ -1,0 +1,386 @@
+.tree {
+    margin-left: 0px;
+}
+
+.branch {
+    display: none;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 15px;
+    padding: 0px;
+    position: relative;
+}
+.dir {
+    cursor: pointer;
+}
+
+.dir:hover {
+    color: #008000;
+}
+
+.module.pod:hover {
+    font-weight: 600;
+    font-size: 130%;
+    color: #008000;
+}
+
+.module:hover {
+    color: #800000;
+    font-weight: 600;
+    font-size: 130%;
+}
+
+.module {
+    cursor: pointer;
+    color: black;
+}
+
+#context {
+    display: none;
+    width: 100%;
+}
+
+.swervepay_blue {
+    color: #036795;
+}
+
+.menu {
+    margin: 0;
+    border-radius: 5px;
+    padding: 0px;
+    position: absolute;
+    display: none;
+    cursor: pointer;
+    border: solid 1px #aaaaaa;
+    background: #333333;
+    display: inline-block;
+}
+
+
+#pe-status-message >  button {
+    margin-left: 25px;
+    font-size: 75%;
+}
+
+#pe-status-message {
+    border-radius: 5px;
+    border: solid 2px;
+    border-color: #999999;
+    padding: 8px;
+    font-size: 14px;
+    font-family: monospace;
+    display: none;
+    align-items: center;
+    color: #333;
+}
+
+#pe-status-message span {
+    margin-left: 30px;
+}
+
+.pe-success-message {
+    background: #00aa22;
+    background-image: url('/icons/burst.png');
+    background-repeat: no-repeat;
+    background-position: left 5px center;
+}
+
+.pe-error-message {
+    background: #ff9999;
+    background-image: url('/icons/alert.red.png');
+    background-repeat: no-repeat;
+    background-position: left 5px center;
+}
+
+.pe-alert-message {
+    background: #f6f485;
+}
+
+li.menu:hover {
+    color: white;
+    background: #333333;
+}
+
+.menu li {
+    margin: 0px;
+    padding: 5px 10px 8px 10px;
+    font-weight: 600;
+    list-style: none;
+    color:#aaaaaa;
+    font-size: 14px;
+    font-family: verdana, arial, helvetica, sans-serif;
+}
+
+h3 {
+    font-family: monospace;
+    font-size: 150%;
+    color: #036795;
+    margin-bottom: 0px;
+    margin-top: 5px;
+    padding: 0px;
+}
+
+ul {
+    margin-top: 5px;
+    margin-left: 0px;
+    margin-bottom: 0px;
+    position: relative;
+    padding: 0px;
+    padding-top: 0px;
+    display: inline-block;
+}
+
+li {
+    font-family: monospace;
+    font-size: 110%;
+    margin-left: 10px;
+}
+
+.folder {
+    display:inline-block;
+    padding-right:10px;
+}
+
+.overlay{
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    background: rgba(255,255,255,0.8) url("/static/img/loading-circle-large.gif") center no-repeat;
+}
+
+.severity {
+    text-align: center;
+}
+
+body.loading{
+    overflow: hidden;   
+}
+
+body.loading .overlay{
+    display: block;
+}
+
+
+.pe-critic-label {
+    padding: 5px;
+    background: #000;
+    color: green;
+    display: inline-block;
+}
+
+.sev-1 {
+    color: white;
+    background: green;
+    font-weight: bold;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-right: 5px;
+}
+.sev-2 {
+    color: #222;
+    background: yellowgreen;
+    font-weight: bold;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-right: 5px;
+}
+.sev-3 {
+    color: #222;
+    background: yellow;
+    font-weight: bold;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-right: 5px;
+}
+
+.sev-4 {
+    color: #fff;
+    background: orangered;
+    font-weight: bold;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-right: 5px;
+}
+
+.sev-5 {
+    color: #fff;
+    background: red;
+    font-weight: bold;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin-right: 5px;
+}
+
+#pe-critic-summary  {
+    display: none;
+    background: #fff;
+    font-family: monospace;
+    font-size: 16px;
+    border: 1px solid #aaa;
+    border-radius:15px;
+    padding:  15px;
+    margin-top: 0px;
+    background: #eee;
+    width: fit-content
+}
+
+h1.pe-critic-heading {
+    color: #036795;
+   font-size: 24px;
+}
+
+#pe-critic-module-name {
+    margin: auto;
+    margin-bottom: 15px;
+    margin-top: 0px;
+    text-align: center;
+}
+
+#pe-critic-module-violations {
+    margin-top: 15px;
+    margin-bottom: 35px;
+    text-align: left;
+}
+
+.pe-critic-dependency-container {
+    margin-top: 35px;
+ }
+
+#pe-critic-module-dependency-list {
+    margin-left: 50px;
+}
+
+#pe-critic-summary {
+    overflow: hidden;
+    clear: both;
+}
+
+#pe-critic-summary input {
+    float: right;
+    color: #555;
+    font-size: 18px;
+    font-family: monospace;
+    font-weight: 600;
+    padding:  5px 10px 5px 10px;
+    margin: 5px;
+    background: #aaa;
+    border: 1px solid #444;
+    border-radius: 5px;
+}
+
+#perl-explorer {
+    float: left;
+}
+
+#hb-menu {
+    float: left;
+    display: none;
+}
+
+#hb { 
+    margin: 0px;
+    width: auto;
+    float: left;
+}
+
+#cb {
+   display: none;
+   width: auto;
+}
+
+#pe-critic-summary input:hover {
+    background: #036795;
+    color: white;
+}
+
+#side-menu {
+    display: inline-block;
+    list-style: none;
+    background: #aaa;
+    padding: 0px;
+    padding-left: 0px;   
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding-top: 0px;
+}
+
+#side-menu li:hover {
+    background: white;
+}
+
+#side-menu li {
+    padding: 5px 10px 5px 10px;
+    margin-left: 0px;
+    margin-right: 0px;
+    font-family: monospace;
+    display: block;
+}
+
+#main-container {
+    margin-top: 0px;
+    margin-left: 0px;
+    float: right;
+}
+
+h2.pe-critic-heading {
+    color: #036795; 
+    background: #aaa;
+    display: block;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    font-size: 14pt;
+}
+
+li.pe-critic-dependency-item.pe-has-pod:hover {
+    color: #036795;
+}
+
+li.pe-critic-dependency-item:hover {
+    color: red;
+}
+
+#pe-critic-module-dependency-list li {
+    cursor: pointer;
+}
+
+#pe-critic-summary-detail-table thead th {
+    background: #aaa;
+    padding: 5px;
+    border: 1px solid #555;
+    border-radius: 5px;
+  }
+
+#pe-critic-summary-detail-table td {
+    text-align-last: center;
+}
+
+#pe-critic-summary-detail-table { 
+    border-spacing: 5px;
+    margin-bottom: 25px;
+}
+#pe-critic-summary-detail-table tr {
+    padding: 5px; 
+}
+
+#pe-critic-module-dependency-container {
+}
+
+
+.pe-critic-violations {
+    display: inline-block;
+}

@@ -1,0 +1,39 @@
+
+#pe-status-message >  button {
+    margin-left: 25px;
+    font-size: 75%;
+}
+
+#pe-status-message {
+    border-radius: 5px;
+    border: solid 2px;
+    border-color: #999999;
+    padding: 8px;
+    font-size: 14px;
+    font-family: monospace;
+    display: none;
+    align-items: center;
+    color: #333;
+}
+
+#pe-status-message span {
+    margin-left: 30px;
+}
+
+.pe-success-message {
+    background: #00aa22;
+    background-image: url('/icons/burst.png');
+    background-repeat: no-repeat;
+    background-position: left 5px center;
+}
+
+.pe-error-message {
+    background: #ff9999;
+    background-image: url('/icons/alert.red.png');
+    background-repeat: no-repeat;
+    background-position: left 5px center;
+}
+
+.pe-alert-message {
+    background: #f6f485;
+}

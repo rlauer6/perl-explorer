@@ -1,0 +1,179 @@
+body { 
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 12pt;
+}
+
+h1 { 
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 16pt;
+  color: #036795;;
+}
+
+h2 { 
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 14pt;
+  color: #036795;;
+}
+
+table, td, th {
+  border: 1px solid;
+}
+
+td, th {
+  padding: 10px;
+  border-color: #000000;
+}
+
+th {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+a:link {
+ text-decoration: none;
+ color: #036795;;
+}
+
+a:visited {
+ text-decoration: none;
+ color: #036795;;
+}
+
+a:hover {
+ color: green;
+ font-weight: 800;
+}
+
+a:hover h1 {
+ color: green;
+}
+
+li {
+ margin: 0px;
+ padding: 5px;
+}
+
+li>p {
+ padding: 0px;
+ margin: 2px;
+}
+
+
+table {
+  border-collapse: collapse;
+}
+
+h3 { 
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 12pt;
+  color: black;
+}
+
+i {
+ color: #036795;;
+ font-weight: 600;
+ font-family: helvetica;
+}
+
+strong { 
+  color: #036795;
+}
+
+em { 
+  color: green;
+  font-weight: 800;
+}
+
+samp, code, textarea {
+  color: #333333;
+  font-weight: 600;
+  font-family: courier, monospace;
+}
+
+blockquote {
+  font-style: italic;
+  color: #aaa; 
+  font-weight: 800;
+  background-color: #f9fdcf;
+  display: inline-block;
+  padding: 10px;
+  margin-top: 5px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  border: 1px dashed;
+  border-radius: 7px;
+}
+
+pre {
+  margin: 5px;
+  margin-top: 10px;
+  margin-left: 15px;
+  padding: 7px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  display: inline-block;
+  color: #555555;
+  font-weight: 600;
+  border: 1px solid;
+  border-radius: 7px;
+  background-color: #f0f0f0;
+  border-color: #999999;
+  font-family: courier, monospace;
+}
+
+.error {
+  color: red;
+  font-family: fixed;
+  font-weight: 800;
+}
+
+.code {
+  font-family: courier, monospace;
+  color: brown;
+  font-weight: 600;
+}
+
+.codeframe {
+  color: black;
+  font-weight: 800;
+  background: #eeeeee;
+  overflow: scroll;
+  font-style: fixed;
+  font-size: 11px;
+  padding: 5px;
+  margin: 5px 5px 5px 0px;
+}
+
+#index li {
+  margin: 0px;
+  padding: 2px;
+}
+
+.bedrock-head body, table, tr, th, td  {
+  border: none;
+  border-collapse: collapse;
+}
+
+.bedrock-index li {
+  margin: 0px;
+  padding: 2px;
+}
+
+.bedrock-config {
+ color: black;
+ background: #dddddd;
+ margin-top: 0;
+}
+
+.bedrock-config-var {
+ color: green;
+ font-weight: 600;
+}
+
+.alpha-navbar {
+    display: inline;
+}
+
+.alpha-navlbar li {
+    display: inline;
+}

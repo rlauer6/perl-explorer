@@ -1,0 +1,27 @@
+Fri Mar  8 17:19:14 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* css/perl-explorer-common.css: new
+	* css/perl-explorer-critic.css: new
+	* css/perl-explorer-pod.css: new
+	* css/perl-explorer-source.css: new
+	* css/perl-explorer.css: new
+	* html/perl-explorer.html: new
+	* js/perl-explorer-common.js: new
+	* js/perl-explorer-critic.js: new
+	* js/perl-explorer-source.js: new
+	* js/perl-explorer.js: new
+	* lib/Apache/Devel/Explorer.pm: new
+	* lib/Devel/Explorer.pm: new
+	* lib/Devel/Explorer.pm.html: new
+	* lib/Devel/Explorer/Critic.pm: new
+	* lib/Devel/Explorer/PodWriter.pm: new
+	* lib/Devel/Explorer/Source.pm: new
+	* lib/Devel/Explorer/Tidy.pm: new
+	* lib/Devel/Explorer/ToDo.pm: new
+	* lib/Devel/Explorer/Utils.pm: new
+	* perl-explorer.json: new
