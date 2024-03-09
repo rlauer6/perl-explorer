@@ -1,0 +1,6 @@
+HTML::Tidy
+Perl::Critic
+Perl::Critic::Policy::Community
+Perl::Tidy
+Markdown::Render
+Template

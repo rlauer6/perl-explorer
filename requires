@@ -1,0 +1,13 @@
+Apache2::compat
+Apache2::Const
+Apache2::Log
+Apache2::Request
+Class::Accessor::Fast
+HTML::Tidy
+JSON
+Module::ScanDeps::Static
+Perl::Critic
+Perl::Tidy
+Readonly
+Template
+# Syntax::SourceHighlight

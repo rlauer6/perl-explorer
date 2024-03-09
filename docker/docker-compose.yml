@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  web:
+    read_only: false
+    build:
+      context: ${PWD}
+      dockerfile: ${PWD}/Dockerfile
+    image: "perl-explorer"
+    ports:
+      - '8080:80'
+    expose:
+      - 80
+    entrypoint: ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+    volumes:
+      - ${PWD}/httpd.conf:/etc/httpd/conf/httpd.conf
+      - ${PWD}/perl-explorer.conf:/etc/httpd/conf.d/perl-explorer.conf
+      - ${PWD}/config:/var/www/config
+      - ${PWD}/css:/var/www/html/css
+      - ${PWD}/js:/var/www/html/js
+      - ${PWD}/lib/perl5:/var/www/lib/perl5
+      

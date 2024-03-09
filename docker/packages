@@ -1,0 +1,12 @@
+automake
+gcc
+gcc-c++
+iputils
+less
+make
+perl-core
+pkgconfig
+procps
+tar
+tree
+

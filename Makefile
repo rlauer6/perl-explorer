@@ -25,7 +25,6 @@ JS = \
    perl-explorer-critic.js \
    perl-explorer-source.js \
 
-
 TEMPLATES = \
    perl-explorer.html
 
@@ -33,18 +32,17 @@ CONFIG = \
    perl-explorer.json
 
 # set your BASE_DIR to the path where your Perl modules live
-BASE_DIR = "$${HOME:-$(HOME)}/git/perl-explorer"
+BASE_DIR = "$${HOME:-$(HOME)}/git/perl-explorer/docker"
 
 CSS_DIR = "$${CSS_DIR:-css}"
 
 JS_DIR = "$${JS_DIR:-js}"
 
-MODULES_DIR = "$${MODULES_DIR:-lib}"
+MODULES_DIR = "$${MODULES_DIR:-lib/perl5}"
 
-TEMPLATES_DIR = 
+TEMPLATES_DIR = "$${TEMPLATES_DIR:-resources}"
 
-CONFIG_DIR =
-
+CONFIG_DIR = "$${CONFIG_DIR:-config}"
 
 .PHONY: check
 

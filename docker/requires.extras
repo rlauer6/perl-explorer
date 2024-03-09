@@ -1,0 +1,6 @@
+# these modules are almost always needed
+Class::Accessor::Fast
+JSON
+List::Util
+Module::ScanDeps::Static
+Readonly

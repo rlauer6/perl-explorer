@@ -2,6 +2,36 @@
 
 This is the `README` file for the `perl-explorer` project.
 
+# TODO
+
+# Project TODO
+
+## Build
+
+* [ ] Docker container
+
+## Configuration
+
+* [ ] move to separate directory, install in more appropriate location
+      under site tree
+* [ ] UI
+
+## Tree View
+
+* [ ] Help
+* [ ] exclude directories
+* [ ] multiple repos?
+
+## Source View
+  [ ] subs drop down
+  [ ] add TODOs
+  [ ] explore use of `ctags`
+
+## Critic View
+
+* [ ] diagnostics
+* [ ] 
+
 # Overview
 
 This project implements an Apache handler for exploring a Perl

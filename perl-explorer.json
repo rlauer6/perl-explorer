@@ -1,10 +1,9 @@
 {
-  "home" : "/app",
+  "home" : "/openbedrock",
   "path" : "~/lib",
-  "perl5lib" : "/home/rlauer/lib/perl5",
   "pod" : {
     "css" : "perl-explorer-pod.css",
-    "author" : "Author - <author@example.com>"
+    "author" : "Rob Lauer - <rlauer6@comcast.net>"
   },
   "critic" : {
     "profile" : "~/.perlcriticrc",
@@ -12,7 +11,7 @@
     "theme" : "pbp",
     "verbose" : 11,
     "js" : [
-      "jquery-3.6.0.min.js",
+      "//code.jquery.com/jquery-3.7.1.min.js",
       "//cdn.datatables.net/2.0.1/js/dataTables.min.js",
       "perl-explorer-critic.js",
       "perl-explorer-common.js"
