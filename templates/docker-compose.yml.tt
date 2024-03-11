@@ -1,0 +1,31 @@
+# this is the Perl Explorer docker-compose file
+#
+#  sitedir => path to root of Apache site (ex: /var/www)
+#  libdir => path to Perl modules in container
+#  datadir => path to resources in container
+#  repo => path on host where modules are actually found
+version: "3.9"
+services:
+  web:
+    read_only: false
+    build:
+      context: \${PWD}
+      dockerfile: \${PWD}/Dockerfile
+    image: "perl-explorer"
+    ports:
+      - '[% defaults.port %]:80'
+    expose:
+      - 80
+    entrypoint: ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+    volumes:
+      - \${PWD}/httpd/httpd.conf:/etc/httpd/conf/httpd.conf
+      - \${PWD}/httpd/perl-explorer.conf:/etc/httpd/conf.d/perl-explorer.conf
+      - \${PWD}/perl-explorer.conf:/etc/httpd/conf.d/perl-explorer.conf
+      - \${PWD}/config:[% defaults.sitedir %]/config
+      - \${PWD}/css:[% site.document_root %]/[% site.css %]
+      - \${PWD}/js:[% site.document_root %]/[% site.js %]
+      - \${PWD}/img:[% site.document_root %]/[% site.img %]
+      - \${PWD}/resources:[% defaults.datadir %]
+      - \${PWD}/lib/perl5:[% perl5libdir %]
+      - [% defaults.repo %]:[% defaults.libdir %]
+      

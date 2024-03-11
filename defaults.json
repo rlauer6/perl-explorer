@@ -1,0 +1,18 @@
+{
+  "defaults": {
+    "repo" : "/home/rclauer/git/openbedrock/src/main/perl/lib",
+    "sitedir" : "/var/www",
+    "datadir" : "/usr/local/share/perl-explorer",
+    "port" : "8080",
+    "libdir" : "/explorer"
+  },
+  "config_template" : "templates/perl-explorer.json.tt",
+  "files": {
+    "templates/docker-compose.yml.tt": "docker/docker-compose.yml",
+    "templates/perlcriticrc.tt": ".perlcriticrc",
+    "templates/perl-explorer.json.tt": "perl-explorer.json",
+    "templates/httpd.conf.tt": "httpd/httpd.conf",
+    "templates/perl-explorer.conf.tt": "httpd/perl-explorer.conf"
+  }
+}
+  

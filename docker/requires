@@ -1,6 +1,7 @@
 HTML::Tidy
 Perl::Critic
-Perl::Critic::Policy::Community
+Perl::Critic::Policy::Community::PreferredAlternatives
 Perl::Tidy
 Markdown::Render
+Module::ScanDeps::Static
 Template

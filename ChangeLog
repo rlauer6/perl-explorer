@@ -1,3 +1,38 @@
+Mon Mar 11 09:42:04 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[configuration/BigBang 2]:
+	* .gitignore
+	* docker/requires
+	* Syntax-SourceHighlight-master.tar.gz: removed
+	* docker/docker-compose.yml: removed
+	* docker/perl-explorer.conf: removed
+	* docker/perl.conf: removed
+	* .perlcriticrc: new
+	* .perltidyrc: new
+	* configure.pl: new
+	* defaults.json: new
+	* httpd/perl-explorer.conf: new
+	* img/perl-logo.png: new
+	* lib/Devel/Explorer/Base.pm: new
+	* stop_words: new
+	* templates/docker-compose.yml.tt: new
+	* templates/httpd.conf.tt: new
+	* templates/perl-explorer-critic.html.tt: new
+	* templates/perl-explorer-error.html.tt: new
+	* templates/perl-explorer-source.html.tt: new
+	* templates/perl-explorer.conf.tt: new
+	* templates/perl-explorer.json.tt: new
+	* templates/perlcriticrc.tt: new
+	* html/perl-explorer.html -> templates/perl-explorer-index.html.tt
+	* Makefile: support configuration changes
+	* lib/Apache/Devel/Explorer.pm: likewise
+	* lib/Devel/Explorer.pm: likewise
+	* lib/Devel/Explorer/Critic.pm: likewise
+	* lib/Devel/Explorer/Source.pm: likewise
+	* lib/Devel/Explorer/Tidy.pm: likewise
+	* lib/Devel/Explorer/ToDo.pm: likewise
+	* lib/Devel/Explorer/Utils.pm: likewise
+
 Fri Mar  8 17:19:14 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[BigBang]:

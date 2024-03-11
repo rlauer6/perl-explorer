@@ -1,4 +1,8 @@
 \#*
 .#*
+*.bak
 docker/perl-explorer
 docker/perl-base
+docker/img
+docker/css
+docker/html

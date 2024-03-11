@@ -29,7 +29,7 @@
       
       <div id="perl-explorer">
         <div id="header">
-          <img src="[% logo %]">
+          <img src="[% site.img %]/[% logo %]">
           </div>
           
           <div id="pe-status-message">

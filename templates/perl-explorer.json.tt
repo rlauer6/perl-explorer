@@ -1,0 +1,72 @@
+{
+  "defaults" : {
+    "sitedir" : "/var/www",
+    "libdir" : "/explorer",
+    "port" : "8080",
+    "datadir" : "/usr/local/share/perl-explorer",
+    "repo" : ""
+  },
+  "perl5libdir" : "[% defaults.sitedir %]/lib/perl5",  
+  "templates" : {
+    "source" : "[% defaults.datadir %]/perl-explorer-source.html.tt",
+    "critic" : "[% defaults.datadir %]/perl-explorer-critic.html.tt",
+    "index" : "[% defaults.datadir %]/perl-explorer-index.html.tt",
+    "error" : "[% defaults.datadir %]/perl-explorer-error.html.tt"
+  },
+  "tidy" : {
+    "profile" : "[% defaults.datadir %]/.perltidyrc"
+  },
+  "index" : {
+    "css" : [
+      "perl-explorer.css",
+      "perl-explorer-common.css"
+    ],
+    "js" : [
+      "//code.jquery.com/jquery-3.7.1.min.js",
+      "perl-explorer.js",
+      "perl-explorer-common.js"
+    ]
+  },
+  "site" : {
+    "document_root": "[% defaults.sitedir %]/html",
+    "css" : "/css",
+    "img" : "/img",
+    "js" : "/js",
+    "logo" : "perl-logo.png"
+  },
+  "path" : "[% defaults.libdir %]",
+  "source" : {
+    "line_numbers" : 1,
+    "js" : [
+      "//code.jquery.com/jquery-3.7.1.min.js",
+      "perl-explorer-source.js",
+      "perl-explorer-common.js"
+    ],
+    "css" : [
+      "perl-explorer-source.css",
+      "perl-explorer-common.css"
+    ]
+  },
+  "pod" : {
+    "author" : "Author - <anonymouse@example.com>",
+    "css" : "perl-explorer-pod.css"
+  },
+  "critic" : {
+    "severity" : 1,
+    "js" : [
+      "//code.jquery.com/jquery-3.7.1.min.js",
+      "//cdn.datatables.net/2.0.1/js/dataTables.min.js",
+      "perl-explorer-critic.js",
+      "perl-explorer-common.js"
+    ],
+    "theme" : "pbp",
+    "profile" : "[% defaults.datadir %]/.perlcriticrc",
+    "css" : [
+      "perl-explorer-common.css",
+      "perl-explorer-critic.css",
+      "perl-explorer-source.css",
+      "//cdn.datatables.net/2.0.1/css/dataTables.dataTables.min.css"
+    ],
+    "verbose" : 11
+  }
+}

@@ -1,0 +1,7 @@
+PerlSwitches -I [% perl5libdir %]
+
+<Location '/explorer'>
+  PerlSetEnv CONFIG  [% defaults.sitedir %]/config/perl-explorer.json
+  SetHandler perl-script
+  PerlResponseHandler Apache::Devel::Explorer
+</Location>  

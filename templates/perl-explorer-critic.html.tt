@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    [% FOREACH file IN css -%]
+    <link rel="stylesheet" type="text/css" href="[% file %]">
+    [% END %]
+    [% FOREACH file IN js -%]
+    <script src="[% file %]" type="text/javascript"></script>
+    [% END %]
+    <title>[% module %]</title>
+  </head>
+  
+  <body>
+    <div id="pe-status-message">
+      <span></span><button>ok</button>
+    </div>
+
+    <input id="pe-save-button" type="button" value="Save" />
+  
+    <table id="critic" class="display">
+      <thead>
+        <tr>
+          <th>Line</th>
+          <th>Col</th>
+          <th>Severity</th>
+          <th>Policy</th>
+          <th>Source</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      [% FOREACH v IN violations %]
+        <tr>
+          <td class="pe-critic-linenumber [% x=v.line_number; todos.$x %]">[% v.line_number %]</td>
+          <td>[% v.column_number %]</td>
+          <td class="severity">[% v.severity %]</td>
+          <td class="pe-critic-policy">[% v.policy_short %]</td>
+          <td class="pe-critic-source[% IF v.source %] tooltip[% END %]">[% v.source_snippet %][% IF v.source %]<span class="tooltip-text">[% v.source %][% END %]</span></td>
+          <td class="pe-critic-description[% IF v.description %] tooltip[% END %]">[% v.description_snippet %][% IF v.description %]<span class="tooltip-text">[% v.description %]</span>[% END %]</td>
+        </tr>
+      [% END -%]
+      </tbody>
+    </table>
+    <div id="tooltip-container"></div>
+  </body>
+</html>

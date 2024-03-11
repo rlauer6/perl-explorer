@@ -1,0 +1,32 @@
+exclude = Freenode
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-Miscellanea::ProhibitUselessNoCritic]
+[-ErrorHandling::RequireCarping]
+[-Modules::RequireVersionVar]
+[-NamingConventions::Capitalization]
+[-Compatibility::PodMinimumVersion]
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 3
+allow_subscripts = 1
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :defaults
+exclude_functions = print
+ 
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol=skip carp cluck confess croak die exit goto warn LOGCROAK LOGCLUCK LOGCARP LOGCONFESS LOGDIE LOGEXIT LOGWARN BAIL_OUT
+
+[CodeLayout::RequireTidyCode]
+perltidyrc=/.perltidyrc
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | METHODS AND SUBROUTINES | AUTHOR
+script_sections = NAME | SYNOPSIS | DESCRIPTION | AUTHOR
+
+[Documentation::PodSpelling]
+stop_words_file = /stop_words
+
+[Community::PreferredAlternatives]
+allowed_modules = JSON Readonly
