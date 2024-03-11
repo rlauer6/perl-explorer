@@ -1,4 +1,4 @@
-#-*- mode: gnumakefile; -* -
+#-*- mode: makefile; -*-
 
 PERL5LIB = "-I $${HOME}/lib/perl5 -I lib"
 
@@ -28,13 +28,16 @@ JS = \
    perl-explorer.js \
    perl-explorer-common.js \
    perl-explorer-critic.js \
-   perl-explorer-source.js \
+   perl-explorer-source.js
 
 IMAGES = \
    perl-logo.png
 
 TEMPLATES = \
-   perl-explorer-index.html.tt
+   perl-explorer-index.html.tt \
+   perl-explorer-critic.html.tt \
+   perl-explorer-error.html.tt \
+   perl-explorer-source.html.tt
 
 CONFIG = \
    perl-explorer.json
@@ -45,27 +48,37 @@ RESOURCES = \
    stop_words
 
 # set your BASE_DIR to the path where your Perl modules live
-BASE_DIR = "$${HOME:-$(HOME)}/git/perl-explorer/docker"
-
+BASE_DIR      = "$${BASE_DIR:-$(HOME)/git/perl-explorer/docker}"
+CONFIG_DIR    = "$${CONFIG_DIR:-config}"
 CSS_DIR = "$${CSS_DIR:-css}"
-
-JS_DIR = "$${JS_DIR:-js}"
-
+HTTPD_DIR     = "$${HTTPD_DIR:-httpd}"
 IMG_DIR = "$${IMG_DIR:-img}"
-
+JS_DIR        = "$${JS_DIR:-js}"
 MODULES_DIR = "$${MODULES_DIR:-lib/perl5}"
-
-TEMPLATES_DIR = "$${TEMPLATES_DIR:-resources}"
-
-CONFIG_DIR = "$${CONFIG_DIR:-config}"
-
 RESOURCES_DIR = "$${RESOURCES_DIR:-resources}"
-
-HTTPD_DIR = "$${HTTPD_DIR:-httpd}"
+TEMPLATES_DIR = "$${TEMPLATES_DIR:-resources}"
 
 .PHONY: check
 
 check:
+	js_dir="$(JS_DIR)"; \
+	css_dir="$(CSS_DIR)"; \
+	base_dir="$(BASE_DIR)"; \
+	config_dir="$(CONFIG_DIR)"; \
+	resources_dir="$(RESOURCES_DIR)"; \
+	httpd_dir="$(HTTPD_DIR)"; \
+	img_dir="$(IMG_DIR)"; \
+	modules_dir="$(MODULES_DIR)"; \
+	templates_dir="$(TEMPLATES_DIR)";\
+	echo "       JS_DIR: $$js_dir"; \
+	echo "      CSS_DIR: $$css_dir"; \
+	echo "   CONFIG_DIR: $$config_dir"; \
+	echo "RESOURCES_DIR: $$resources_dir"; \
+	echo "    HTTPD_DIR: $$httpd_dir"; \
+	echo "      IMG_DIR: $$img_dir"; \
+	echo "     BASE_DIR: $$base_dir"; \
+	echo "  MODULES_DIR: $$modules_dir"; \
+	echo "TEMPLATES_DIR: $$templates_dir"; \
 	for a in $(PERLMODULES); do \
 	  perl -wc "$(PERL5LIB)" "lib/$$a"; \
 	done
@@ -84,7 +97,7 @@ install: check
 	echo "       JS_DIR: $$js_dir"; \
 	echo "      CSS_DIR: $$css_dir"; \
 	echo "   CONFIG_DIR: $$config_dir"; \
-	echo "   RESOURCES_DIR: $$resources_dir"; \
+	echo "RESOURCES_DIR: $$resources_dir"; \
 	echo "    HTTPD_DIR: $$httpd_dir"; \
 	echo "      IMG_DIR: $$img_dir"; \
         echo "     BASE_DIR: $$base_dir"; \

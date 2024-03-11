@@ -38,8 +38,6 @@ sub new {
 
   my $self = $class->SUPER::new($options);
 
-  my $config = $self->init_config;
-
   $self->set_defaults;
 
   return $self;
@@ -54,7 +52,10 @@ sub verify_template {
   my $config   = $self->get_config;
 
   if ( !$template ) {
-    $template = sprintf '%s/%s', $config->{templates}->{$default_template};
+      $template = $config->{templates}->{$default_template};
+
+      die "no such template ($default_template) found in configuration\n"
+        if !$template;
   }
 
   die "unable to find template ($template)\n"

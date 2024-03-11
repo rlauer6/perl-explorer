@@ -48,11 +48,18 @@ sub set_defaults {
 ########################################################################
   my ($self) = @_;
 
-  $self->set_css( $self->get_css           // ['perl-explorer-source.css'] );
-  $self->set_css_path( $self->get_css_path // ['/css'] );
+    my $config = $self->get_config || {};
 
-  $self->set_css( fix_path( $self->get_css_path, $self->get_css ) );
-  $self->set_js( fix_path( $self->get_js_path, $self->get_js ) );
+    my $css      = $self->get_css      // $config->{source}->{css};
+    my $css_path = $self->get_css_path // $config->{site}->{css};
+
+    my $js      = $self->get_js      // $config->{source}->{js};
+    my $js_path = $self->get_js_path // $config->{site}->{js};
+
+    $css //= ['perl-explorer-source.css'];
+
+    $self->set_css( fix_path( $css_path, $css ) );
+    $self->set_js( fix_path( $js_path, $js ) );
 
   $self->set_outputlang( $self->get_outputlang // 'htmlcss.outlang' );
   $self->set_inputlang( $self->get_inputlang   // 'perl.lang' );
@@ -143,14 +150,16 @@ sub highlight {
 
   # TODO: fix regexp
   if ( $options->{add_links} ) {
-    while ( $highlighted_source =~ /(keyword\">use<\/span>)([^;]+?)(<span\s*class=\"symbol\">);/xsm
+        while ($highlighted_source =~ /(keyword\">use<\/span>)([^;]+?)(<span\s*class=\"symbol\">);/xsm
       && $highlighted_source !~ /module/ ) {
       $highlighted_source
         =~ s/(keyword\">use<\/span>)([^;]+?)(<span\s*class=\"symbol\">);/$1<span class=\"module\">$2<\/span>$3;<\/span>/xsmg;
     }
   }
 
-  my $template = $self->get_template;
+    my $template = slurp_file( $self->get_template );
+
+    dbg template => $template;
 
   return $highlighted_source
     if !$use_template || !$template;

@@ -46,3 +46,20 @@ Providing a UI to:
 * Add a POD template to Perl modules
 * Display `perlcritic` finding for a Perl module
 * Tidy Perl modules by using `perltidy`
+
+
+# Custom Container
+
+```
+yum install -y gcc gcc-c++ libtidyp libtidyp-devel source-highlight source-highlight-devel
+ln -s /usr/lib64/libboost_regex.so.1.53.0 /usr/lib64/libboost_regex.so
+
+cpanm -n -v \
+  Syntax::SourceHighlight \
+  Perl::Tidy \
+  HTML::Tidy \
+  Template \
+  Perl::Critic::Policy::Community::PreferredAlternatives \
+  Module::ScanDeps::Static
+  
+```

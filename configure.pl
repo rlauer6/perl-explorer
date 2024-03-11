@@ -15,9 +15,6 @@ use Readonly;
 use JSON;
 
 Readonly::Scalar our $DEFAULT_CONFIG  => 'defaults.json';
-Readonly::Scalar our $DEFAULT_LIBDIR  => '/explorer';
-Readonly::Scalar our $DEFAULT_DATADIR => '/usr/local/share/perl-explorer';
-Readonly::Scalar our $DEFAULT_SITEDIR => '/var/www';
 Readonly::Scalar our $DEFAULT_PORT    => '8080';
 
 use parent qw(CLI::Simple);
@@ -71,6 +68,7 @@ sub configure {
   };
 
   my $template   = slurp_file( $config->{config_template} );
+
   my $new_config = tt_process( $template, $params );
   $new_config = JSON->new->decode($new_config);
   $new_config->{defaults} = $params->{defaults};
@@ -78,6 +76,8 @@ sub configure {
   $self->save( $file_list->{ $config->{config_template} }, $new_config );
 
   foreach my $template_file ( keys %{$file_list} ) {
+    next if $template_file eq $config->{config_template};
+      
     my $template = slurp_file($template_file);
     $template =~ s/^[#][^\n]*\n//xsmg;
 
@@ -128,9 +128,6 @@ sub main {
     option_specs    => \@option_specs,
     extra_options   => [],
     default_options => {
-      sitedir => $DEFAULT_SITEDIR,
-      libdir  => $DEFAULT_LIBDIR,
-      datadir => $DEFAULT_DATADIR,
       port    => $DEFAULT_PORT,
       config  => $DEFAULT_CONFIG,
     },

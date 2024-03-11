@@ -1,3 +1,28 @@
+Mon Mar 11 17:26:01 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[custom container]:
+	* .gitignore: docker/docker-compose.yml
+	* Makefile
+	- default BASE_DIR
+	- added httpd
+	* README.md
+	- add notes about custom containers
+	* configure.pl
+	- skip perl-explorer.json
+	- don't override site, lib, datadir with defaults
+	* httpd/httpd.conf: removed
+	* httpd/perl-explorer.conf: removed
+	* lib/Apache/Devel/Explorer.pm
+	(handler)
+	- support trailing slash
+	- pass config to Source
+	* lib/Devel/Explorer/Base.pm
+	(verify_template): no need for sprintf
+	* lib/Devel/Explorer/Source.pm
+	(set_defaults): use config object
+	(highlight): template is now filename, so fetch
+	* templates/perl-explorer-index.html.tt: logo is fqp
+
 Mon Mar 11 09:42:04 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[configuration/BigBang 2]:

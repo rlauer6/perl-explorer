@@ -109,7 +109,7 @@ sub handler {
 
   my $uri = $r->uri;
 
-  if ( $uri =~ /\/explorer$/xsm ) {
+    if ( $uri =~ /\/explorer\/?$/xsm ) {
     return explorer( $r, explorer => $explorer );
   }
 
@@ -247,7 +247,10 @@ sub api_source_lines {
 
   my $source = fetch_source_from_module( explorer => $explorer, module => $module );
 
-  my $source_explorer = Devel::Explorer::Source->new( source => $source, );
+    my $source_explorer = Devel::Explorer::Source->new(
+        config => $explorer->get_config,
+        source => $source,
+    );
 
   my $highlighted_source = $source_explorer->highlight_source_lines();
 
@@ -375,8 +378,6 @@ sub explorer {
   my ($explorer) = @{$options}{qw(explorer)};
 
   $explorer->set_tree( { $ROOT_NODE => $explorer->get_tree } );
-
-  dbg tree => $explorer->get_tree;
 
   my $index = $explorer->directory_index($ROOT_NODE);  # $ROOT_NODE);
 
@@ -544,8 +545,7 @@ sub show_index {
 
   my $directory = get_module_directory('/app/lib');
 
-  my $li = join "\n",
-    map { sprintf '<li class="alpha-navbar"><a href="/pod/%s">%s</a></li>', $_, $_ } ( 'A' .. 'Z' );
+    my $li = join "\n", map { sprintf '<li class="alpha-navbar"><a href="/pod/%s">%s</a></li>', $_, $_ } ( 'A' .. 'Z' );
 
   my $listing = $directory->{$letter} // [];
 
@@ -603,13 +603,12 @@ sub show_source {
 
   my $config = $explorer->get_config;
 
+    my $source = fetch_source_from_module( explorer => $explorer, module => $module );
+
   my $source_explorer = Devel::Explorer::Source->new(
-    source       => scalar fetch_source_from_module( explorer => $explorer, module => $module ),
+        source       => $source,
+        config       => $config,
     use_template => $TRUE,
-    js           => $config->{source}->{js},
-    js_path      => $config->{site}->{js},
-    css          => $config->{source}->{css},
-    css_path     => $config->{site}->{css},
   );
 
   output_html( $r, $source_explorer->highlight( module => $module ) );
@@ -823,8 +822,6 @@ sub _output {
   }
 
   $r->content_type($content_type);
-
-  dbg content => $content;
 
   if ( $content_type eq 'application/json' && ref $content ) {
     $content = JSON->new->pretty($pretty)->encode($content);
