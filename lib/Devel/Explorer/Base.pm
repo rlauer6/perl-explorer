@@ -50,7 +50,7 @@ sub verify_template {
 
   my $template = $self->get_template;
   my $config   = $self->get_config;
-
+  
   if ( !$template ) {
       $template = $config->{templates}->{$default_template};
 

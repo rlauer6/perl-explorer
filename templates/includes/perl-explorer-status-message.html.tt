@@ -1,0 +1,7 @@
+<div id="pe-status-message" class="pe-error-message">
+  <div class="pe-status-message-container">
+    <span>this is a more realistic message</span>
+  </div>    
+
+  <button class="pe-button">OK</button>
+</div>

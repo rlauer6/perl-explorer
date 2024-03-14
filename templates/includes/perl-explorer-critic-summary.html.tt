@@ -1,0 +1,38 @@
+<div id="pe-critic-summary">
+  
+  <h1 class="pe-critic-heading" id="pe-critic-module-name"></h1>
+  
+  <table id="pe-critic-summary-detail-table">
+    <thead>
+      <th>Line Count</th>
+      <th>Dependency Count</th>
+      <th>Methods</th>
+      <th>Has Pod</th>
+      <th>Is Tidy</th>
+      <th>Violations</th>
+      <th>Avg Complexity</th>
+    </thead>
+    <tbody>
+      <tr>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="pe-critic-summary-detail" id="pe-critic-module-violations">
+    <span class="pe-critic-label sev-1"></span>
+    <span class="pe-critic-label sev-2"></span>
+    <span class="pe-critic-label sev-3"></span>
+    <span class="pe-critic-label sev-4"></span>
+    <span class="pe-critic-label sev-5"></span>
+  </div>
+  
+  <div class="pe-critic-dependency-container">
+    <h2 class="pe-critic-heading">Dependencies</h2>
+    
+    <ul id="pe-critic-module-dependency-list">
+    </ul>
+  </div>
+  
+  <input class='pe-button pe-button-detail' type="button" value="Detail" />
+  <input class='pe-button pe-button-close' type="button" value="Ok" />
+</div>

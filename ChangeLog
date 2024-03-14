@@ -1,3 +1,67 @@
+Thu Mar 14 16:55:04 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[styling, todo comments, reorg]:
+	* templates/includes/perl-explorer-critic-summary.html.tt: new
+	* templates/includes/perl-explorer-header.html.tt: new
+	* templates/includes/perl-explorer-status-message.html.tt: new
+	* Makefile: add new files to build
+	* .perltidyrc: line length: 125, indent 4
+	* configure.pl
+	* css/perl-explorer-common.css: organize and create more stylin'
+	* css/perl-explorer-critic.css: likewise
+	* css/perl-explorer-source.css: likewise
+	* css/perl-explorer.css: likewise
+	* defaults.json
+	* js/perl-explorer-common.js
+	(open_modal): new
+	(close_modal): new
+	* js/perl-explorer-critic.js
+	- policy desriptions
+	* js/perl-explorer-source.js
+	- to do comments
+	* js/perl-explorer.js: yes/no for has_pod, is_tidy
+	* lib/Apache/Devel/Explorer.pm
+	(handler)
+	- change path for critic detail todos to /explorer/todos/critic
+	- add new api for source todos
+	(api_todos): support for source todos
+	(show_pod): html_error was called incorrectly
+	(show_source)
+	- trap errors
+	- add dependencies, todo number
+	(create_dependency_listing): add is_local flags
+	* lib/Devel/Explorer.pm
+	(update_pod_status): set name in package_names hash
+	* lib/Devel/Explorer/Base.pm
+	* lib/Devel/Explorer/Critic.pm
+	(render_violations)
+	- remove Critic::Policy prefix
+	- add JSON object with diagnostics
+	* lib/Devel/Explorer/Source.pm
+	(set_defaults): add anchors
+	(highlight)
+	- support for anchors
+	- add dependencies, sub, todos
+	(find_subs): new
+	* lib/Devel/Explorer/ToDo.pm
+	(set_defaults): wrap_columns
+	(save_todos): support source todos
+	(_validate_todo_list)
+	- remove non-digits from line numbers
+	- don't check for policies if not no-critic todos
+	* lib/Devel/Explorer/Utils.pm
+	- added $SPACE
+	(tt_process): set INCLUDE_PATH
+	(fetch_source_from_module): check package_names if module not in tree
+	(create_pod): return from find_requires is array, not list
+	* templates/perl-explorer-critic.html.tt: use include files, minor updates
+	* templates/perl-explorer-error.html.tt: likewise
+	* templates/perl-explorer-index.html.tt: likewise
+	* templates/perl-explorer-source.html.tt: likewse
+	* templates/perl-explorer.conf.tt: 
+	* templates/perl-explorer.json.tt
+
+
 Mon Mar 11 17:26:01 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[custom container]:

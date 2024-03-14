@@ -6,7 +6,7 @@
     "datadir" : "/usr/local/share/perl-explorer",
     "repo" : ""
   },
-  "perl5libdir" : "[% defaults.sitedir %]/lib/perl5",  
+  "perl5libdir" : "[% defaults.sitedir %]/lib",  
   "templates" : {
     "source" : "[% defaults.datadir %]/perl-explorer-source.html.tt",
     "critic" : "[% defaults.datadir %]/perl-explorer-critic.html.tt",
@@ -28,11 +28,11 @@
     ]
   },
   "site" : {
-    "document_root": "[% defaults.sitedir %]/html",
-    "css" : "/css",
-    "img" : "/img",
-    "js" : "/js",
-    "logo" : "perl-logo.png"
+    "document_root": "[% defaults.sitedir %]",
+    "css" : "/static/css",
+    "img" : "/static/img",
+    "js" : "/static/js",
+    "logo" : "/static/img/swerve-logo-top-01.png"
   },
   "path" : "[% defaults.libdir %]",
   "source" : {

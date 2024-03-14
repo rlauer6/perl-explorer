@@ -19,42 +19,46 @@ Readonly::Scalar our $DOUBLE_COLON => q{::};
 Readonly::Scalar our $EMPTY        => q{};
 Readonly::Scalar our $COMMA        => q{,};
 Readonly::Scalar our $PERIOD       => q{.};
+Readonly::Scalar our $SPACE       => q{ };
 
 Readonly::Scalar our $TRUE  => 1;
 Readonly::Scalar our $FALSE => 0;
 
+Readonly::Scalar our $DEFAULT_INCLUDE_PATH => '/usr/loca/share/perl-explorer';
+  
 our %EXPORT_TAGS = (
-  funcs => [
-    qw(
-      add_pod
-      get_args
-      create_backup
-      fetch_source_from_module
-      find_requires
-      fix_path
-      is_array
-      is_hash
-      replace_file
-      slurp_file
-      slurp_json
-      tt_process
-      dbg
-    )
-  ],
-  booleans => [
-    qw(
-      $TRUE
-      $FALSE
-    )
-  ],
-  chars => [
-    qw(
-      $EMPTY
-      $DOUBLE_COLON
-      $COMMA
-      $PERIOD
-    )
-  ],
+    funcs => [
+        qw(
+          add_pod
+          get_args
+          create_backup
+          fetch_source_from_module
+          find_requires
+          fix_path
+          is_array
+          is_hash
+          replace_file
+          slurp_file
+          slurp_json
+          tt_process
+          dbg
+        )
+    ],
+    booleans => [
+        qw(
+          $TRUE
+          $FALSE
+        )
+    ],
+    chars => [
+        qw(
+          $COMMA
+          $DOUBLE_COLON
+          $EMPTY
+          $PERIOD
+          $SPACE
+        )
+    ],
 
 );
 
@@ -69,93 +73,101 @@ caller or __PACKAGE__->main();
 ########################################################################
 sub is_hash {
 ########################################################################
-  my ($obj) = @_;
+    my ($obj) = @_;
 
-  return $obj && reftype($obj) eq 'HASH';
+    return $obj && reftype($obj) eq 'HASH';
 }
 
 ########################################################################
 sub is_array {
 ########################################################################
-  my ($obj) = @_;
+    my ($obj) = @_;
 
-  return $obj && reftype($obj) eq 'ARRAY';
+    return $obj && reftype($obj) eq 'ARRAY';
 }
 
 ########################################################################
 sub slurp_file {
 ########################################################################
-  my ($file) = @_;
+    my ($file) = @_;
 
-  local $RS = undef;
+    local $RS = undef;
 
-  open my $fh, '<', $file
-    or die "could not open $file for reading: $OS_ERROR";
+    open my $fh, '<', $file
+      or die "could not open $file for reading: $OS_ERROR";
 
-  my $content = <$fh>;
+    my $content = <$fh>;
 
-  close $fh;
+    close $fh;
 
-  return wantarray ? split /\n/xsm, $content : $content;
+    return wantarray ? split /\n/xsm, $content : $content;
 }
 
 ########################################################################
 sub slurp_json {
 ########################################################################
-  my ($file) = @_;
+    my ($file) = @_;
 
-  my $content = slurp_file($file);
+    my $content = slurp_file($file);
 
-  my $obj = JSON->new->decode($content);
+    my $obj = JSON->new->decode($content);
 
-  return $obj;
+    return $obj;
 }
 
 ########################################################################
 sub find_requires {
 ########################################################################
-  my ($source) = @_;
+    my ($source) = @_;
 
-  require Module::ScanDeps::Static;
+    require Module::ScanDeps::Static;
 
-  my $scanner = Module::ScanDeps::Static->new();
+    my $scanner = Module::ScanDeps::Static->new();
 
-  return [ $scanner->parse( \$source ) ];
+    return [ $scanner->parse( \$source ) ];
 }
 
 ########################################################################
 sub tt_process {
 ########################################################################
-  my ( $source, $params ) = @_;
+    my ( $source, $params ) = @_;
 
-  my $tt = Template->new( { INTERPOLATE => 1 } );
+    my $include_path = $ENV{TT_INCLUDE_PATH} // $DEFAULT_INCLUDE_PATH;
+    $include_path = [ split /:/xsm, $include_path ];
+    
+    my $tt = Template->new( { INTERPOLATE => 1, INCLUDE_PATH => $include_path });
 
-  my $output = q{};
+    my $output = q{};
 
-  $tt->process( \$source, $params, \$output )
-    or die $tt->error();
+    $tt->process( \$source, $params, \$output )
+      or die $tt->error();
 
-  return $output;
+    return $output;
 }
 
 ########################################################################
 sub fetch_source_from_module {
 ########################################################################
-  my @args = @_;
+    my @args = @_;
 
-  my $options = get_args(@args);
+    my $options = get_args(@args);
 
-  my ( $explorer, $module ) = @{$options}{qw(explorer module)};
+    my ( $explorer, $module ) = @{$options}{qw(explorer module)};
 
-  die "usage: fetch_source_from_module(explorer => explorer, module => module)\n"
-    if !$explorer || !$module;
+    die "usage: fetch_source_from_module(explorer => explorer, module => module)\n"
+      if !$explorer || !$module;
 
-  my $file = $explorer->get_module_path($module);
+    my $file = $explorer->get_module_path($module);
 
-  die "no file found\n"
-    if !$file;
+    if ( !$file ) {
+        my $package_names = $explorer->get_package_names;
+        $file = $package_names->{$module};
+    }
+    
+    die "no file found\n"
+      if !$file;
 
-  return slurp_file($file);
+    return slurp_file($file);
 }
 
 ########################################################################
@@ -165,143 +177,144 @@ sub get_args { return ref $_[0] ? $_[0] : {@_}; }
 ########################################################################
 sub create_backup {
 ########################################################################
-  my ($file) = @_;
+    my ($file) = @_;
 
-  my $backup = "$file.bak";
+    my $backup = "$file.bak";
 
-  if ( -e $backup ) {
-    unlink $backup;  # remove if it exists
-  }
+    if ( -e $backup ) {
+        unlink $backup;  # remove if it exists
+    }
 
-  return rename( $file, $backup ) ? $backup : $EMPTY;
+    return rename( $file, $backup ) ? $backup : $EMPTY;
 }
 
 ########################################################################
 sub dbg {
 ########################################################################
-  return print {*STDERR} Dumper( \@_ );
+    return print {*STDERR} Dumper( \@_ );
 }
 
 ########################################################################
 sub replace_file {
 ########################################################################
-  my (@args) = @_;
+    my (@args) = @_;
 
-  my ($options) = get_args(@args);
+    my ($options) = get_args(@args);
 
-  my ( $source, $infile, $outfile, $unlink ) = @{$options}{qw(source infile outfile unlink)};
+    my ( $source, $infile, $outfile, $unlink ) = @{$options}{qw(source infile outfile unlink)};
 
-  my $backup = create_backup($infile);
+    my $backup = create_backup($infile);
 
-  if ($source) {
-    my ( $fh, $tmpnam ) = tempfile();
-    $outfile = $tmpnam;
+    if ($source) {
+        my ( $fh, $tmpnam ) = tempfile();
+        $outfile = $tmpnam;
 
-    print {$fh} $source;
+        print {$fh} $source;
 
-    close $fh;
+        close $fh;
 
-    $unlink //= $TRUE;
-  }
-
-  if ( !$backup ) {
-    if ($unlink) {
-      unlink $outfile;
+        $unlink //= $TRUE;
     }
 
-    die "error creating pod file...check permissions: $OS_ERROR\n";
-  }
+    if ( !$backup ) {
+        if ($unlink) {
+            unlink $outfile;
+        }
 
-  if ( !copy( $outfile, $infile ) ) {
-    rename $backup, $infile;
+        die "error creating pod file...check permissions: $OS_ERROR\n";
+    }
 
-    die "error creating $infile...check permissions: $OS_ERROR\n";
-  }
-  elsif ($unlink) {
-    unlink $outfile;
-  }
+    if ( !copy( $outfile, $infile ) ) {
+        rename $backup, $infile;
 
-  chmod 0666, $infile;
+        die "error creating $infile...check permissions: $OS_ERROR\n";
+    }
+    elsif ($unlink) {
+        unlink $outfile;
+    }
 
-  return $infile;
+    chmod 0666, $infile;
+
+    return $infile;
 }
 
 ########################################################################
 sub add_pod {
 ########################################################################
-  my @args = @_;
+    my @args = @_;
 
-  my $options = get_args(@args);
+    my $options = get_args(@args);
 
-  my ( $file, $append, $config ) = @{$options}{qw(file append config)};
+    my ( $file, $append, $config ) = @{$options}{qw(file append config)};
 
-  my $pod = create_pod($options);
+    my $pod = create_pod($options);
 
-  replace_file( infile => $file, source => $pod );
+    replace_file( infile => $file, source => $pod );
 
-  return $TRUE;
+    return $TRUE;
 }
 
 # add path to relative files, returns a new list of files
 ########################################################################
 sub fix_path {
 ########################################################################
-  my ( $path, @files ) = @_;
+    my ( $path, @files ) = @_;
 
-  my @paths = ref $files[0] ? @{ $files[0] } : @files;
+    my @paths = ref $files[0] ? @{ $files[0] } : @files;
 
-  foreach my $f ( grep {defined} @paths ) {
-    next if $f =~ /^\//xsm;
-    $f = "$path/$f";
-  }
+    foreach my $f ( grep {defined} @paths ) {
+        next if $f =~ /^\//xsm;
+        $f = "$path/$f";
+    }
 
-  return \@paths;
+    return \@paths;
 }
 
 ########################################################################
 sub create_pod {
 ########################################################################
-  my @args = @_;
+    my @args = @_;
 
-  my $options = get_args(@args);
+    my $options = get_args(@args);
 
-  my ( $file, $source, $config, $module ) = @{$options}{qw(file source config module)};
+    my ( $file, $source, $config, $module ) = @{$options}{qw(file source config module)};
 
-  $config //= {};
+    $config //= {};
 
-  my $author = $config->{pod}->{author};
+    my $author = $config->{pod}->{author};
 
-  if ( !$source ) {
-    $source = slurp_file $file;
-  }
+    if ( !$source ) {
+        $source = slurp_file $file;
+    }
 
-  die 'no source'
-    if !$source;
+    die 'no source'
+      if !$source;
 
-  if ( !$module && $source =~ /^package\s+([^;]+);/xsm ) {
-    $module = $1;
-  }
+    if ( !$module && $source =~ /^package\s+([^;]+);/xsm ) {
+        $module = $1;
+    }
 
-  my @subs;
+    my @subs;
 
-  my @see_also = find_requires($source);
+    my $see_also = find_requires($source);
 
-  while ( $source =~ /^sub\s+([^{ \n]+)/xsmg ) {
-    push @subs, $1;
-  }
+    while ( $source =~ /^sub\s+([^{ \n]+)/xsmg ) {
+        push @subs, $1;
+    }
 
-  local $Text::Wrap::columns = 80;
+    local $Text::Wrap::columns = 72;
 
-  my $see_also = wrap( $EMPTY, $EMPTY, join "$COMMA ", map { sprintf 'L<%s>', $_ } @see_also );
+    my $see_also_pod = wrap( $EMPTY, $EMPTY, join "$COMMA ", map { sprintf 'L<%s>', $_ } @{$see_also} );
 
-  my $params = {
-    module   => $module // 'No::Name',
-    subs     => [ sort @subs ],
-    author   => $author // 'anonymouse',
-    see_also => $see_also,
-  };
+    
+    my $params = {
+        module   => $module // 'No::Name',
+        subs     => [ sort @subs ],
+        author   => $author // 'anonymouse',
+        see_also => $see_also_pod,
+    };
 
-  my $pod_tpl = <<'END_OF_POD';
+    my $pod_tpl = <<'END_OF_POD';
 =pod
 
 =head1 NAME
@@ -335,19 +348,19 @@ TODO - documents methods and subroutines
 =cut
 END_OF_POD
 
-  my $pod = tt_process( $pod_tpl, $params );
+    my $pod = tt_process( $pod_tpl, $params );
 
-  return $options->{append} ? "$source\n$pod" : $pod;
+    return $options->{append} ? "$source\n$pod" : $pod;
 }
 
 ########################################################################
 sub main {
 ########################################################################
-  my $file = shift @ARGV;
+    my $file = shift @ARGV;
 
-  print add_pod( file => $file, append => 1 );
+    print add_pod( file => $file, append => 1 );
 
-  return;
+    return;
 }
 
 1;

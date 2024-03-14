@@ -5,6 +5,10 @@
     cursor: pointer;
 }
 
+.pe-critic-policy {
+    cursor: pointer;
+}
+
 input.pe-button-enabled {
     color: white;
     font-weight: normal;
@@ -13,17 +17,20 @@ input.pe-button-enabled {
 
 #pe-save-button {
     float: right;
+    border: 1px solid #444;
+    border-radius: 5px;
+    color: white;
+    background: #036795;
     font-size: 18px;
     font-family: monospace;
     padding:  5px 10px 5px 10px;
-    margin: 5px;
-    border: 1px solid #444;
-    border-radius: 5px;
- }
+    margin: 0px 5px 5px 5px;
+    background: #036795;
+}
 
 input.pe-button-disabled {
-    color: #eee;
-    background: #555;
+    background: #fff !important;;
+    color: #aaa !important;
 }
 
 input.pe-button-enabled:hover {
@@ -49,6 +56,49 @@ td.pe-critic-todo {
 
 .tooltip-text {
     display: none;
+}
+
+#diagnostic h1 {
+    padding: 0px 20px 20px 20px;
+    margin: 5px 0px 5px 0px; 
+    color: #036795;
+    font-size: 150%;
+}
+
+.pe-diagnostic-message-container {
+    padding: 20px;
+    margin: 0px 40px 20px 40px;
+    text-align: left;
+    color: #000;
+    max-height: 600px;
+    overflow: scroll;
+    background: lightcyan;
+    border-radius: 12px;
+    
+} 
+
+.pe-status-message-container {
+    margin: 30px 80px 0px 30px;
+}
+
+#diagnostic {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    text-align: center;
+    left: 20%;
+    top: 5%;
+    background: white;
+    border-radius: 12px;
+    border: solid;
+    border-width: 2px 5px 5px 2px;
+    border-color: #999;
+    padding: 8px;
+    font-size: 125%;
+    font-family: sans-serif;
+    color: #555;
+    z-index: 999;
+    overflow: hidden;
 }
 
 .description-full {

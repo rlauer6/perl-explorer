@@ -1,96 +1,47 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  [% INCLUDE "perl-explorer-header.html.tt" %]
+  
+  <body>
+    <div id="hb">
+      <label for="cb" style="">&#9776;</label>
+      <input type="checkbox" id="cb"  />
+    </div>
+    
+    <div id="hb-menu">
+      <ul id="side-menu" >
+        <li>Configure</li>
+        <li>Help</li>
+      </ul>
+    </div>
+        
+    <div id="perl-explorer">
 
-    [% FOREACH file IN css -%]
-    <link rel="stylesheet" type="text/css" href="[% file %]">
-      [% END %]
-
-      [% FOREACH file IN js -%]
-      <script src="[% file %]" type="text/javascript"></script>
-      [% END %]
-    </head>
-
-    <body>
-      <div id="hb">
-        <label for="cb" style="">&#9776;</label>
-        <input type="checkbox" id="cb" "/>
-      </div>
-      
-      <div id="hb-menu">
-        <ul id="side-menu" >
-          <li>Configure</li>
-          <li>Help</li>
-        </ul>
+      <div id="header">
+        <img src="[% logo %]" />
       </div>
 
+      [% INCLUDE "perl-explorer-status-message.html.tt" %]
       
-      <div id="perl-explorer">
-        <div id="header">
-          <img src="[% logo %]">
-          </div>
-          
-          <div id="pe-status-message">
-              <span></span><button>ok</button>
-            </div>
-            
-              <div id="pe-critic-summary">
-                
-                <h1 class="pe-critic-heading" id="pe-critic-module-name"></h1>
-                
-                <table id="pe-critic-summary-detail-table">
-                  <thead>
-                    <th>Line Count</th>
-                    <th>Dependency Count</th>
-                    <th>Methods</th>
-                    <th>Has Pod</th>
-                    <th>Is Tidy</th>
-                    <th>Violations</th>
-                    <th>Avg Complexity</th>
-                  </thead>
-                  <tbody>
-                    <tr>
-                    </tr>
-                  </tbody>
-                </table>
-                
-                <div class="pe-critic-summary-detail" id="pe-critic-module-violations">
-                  <span class="pe-critic-label sev-1"></span>
-                  <span class="pe-critic-label sev-2"></span>
-                  <span class="pe-critic-label sev-3"></span>
-                  <span class="pe-critic-label sev-4"></span>
-                  <span class="pe-critic-label sev-5"></span>
-                </div>
-                
-                <div class="pe-critic-dependency-container">
-                  <h2 class="pe-critic-heading">Dependencies</h2>
-                  
-                  <ul id="pe-critic-module-dependency-list">
-                  </ul>
-                </div>
-                
-                <input class='pe-button pe-button-detail' type="button" value="Detail" \>
-                <input class='pe-button pe-button-close' type="button" value="Ok" \>
-              </div>
-
-                  <div id="tree" >
-                    [% module_listing %]
-                  </div>
-
-                </div>
-                
-                <div id="context">
-                  <ol class="menu">
-                    <li class="menu-li">Source</li>
-                    <li class="menu-li">Pod</li>
-                    <li class="menu-li">Critic (Summary)</li>
-                    <li class="menu-li">Critic (Detail)</li>
-                  </ol>
-                </div>
-                
-                <div class="overlay"></div>
-                
-              </body>
-            </html>
+      [% INCLUDE "perl-explorer-critic-summary.html.tt" %]
+      
+      <div id="tree" >
+        [% module_listing %]
+      </div>
+      
+    </div>
+    
+    <div id="context">
+      <ol class="menu">
+        <li class="menu-li">Source</li>
+        <li class="menu-li">Pod</li>
+        <li class="menu-li">Critic (Summary)</li>
+        <li class="menu-li">Critic (Detail)</li>
+      </ol>
+    </div>
+    
+    <div class="spinner"></div>
+    
+  </body>
+</html>

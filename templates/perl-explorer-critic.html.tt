@@ -1,24 +1,24 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+  [% title = module %]
 
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    [% FOREACH file IN css -%]
-    <link rel="stylesheet" type="text/css" href="[% file %]">
-    [% END %]
-    [% FOREACH file IN js -%]
-    <script src="[% file %]" type="text/javascript"></script>
-    [% END %]
-    <title>[% module %]</title>
-  </head>
-  
+  [% INCLUDE "perl-explorer-header.html.tt" %]
+
   <body>
-    <div id="pe-status-message">
-      <span></span><button>ok</button>
+
+    [% INCLUDE "perl-explorer-status-message.html.tt" %]
+    
+    <input id="pe-save-button" type="button" value="Save" />
+
+    <div id="diagnostic" class="swervepay-blue">
+      <h1></h1>
+      <div class="pe-diagnostic-message-container">
+        <span>this is a more realistic message</span>
+      </div>    
+      
+      <button class="pe-button">OK</button>
     </div>
 
-    <input id="pe-save-button" type="button" value="Save" />
-  
     <table id="critic" class="display">
       <thead>
         <tr>
@@ -44,6 +44,11 @@
       [% END -%]
       </tbody>
     </table>
+
     <div id="tooltip-container"></div>
+    
+    <script>
+      var diagnostics = [% diagnostics_json %];
+    </script>
   </body>
 </html>

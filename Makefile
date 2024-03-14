@@ -37,7 +37,11 @@ TEMPLATES = \
    perl-explorer-index.html.tt \
    perl-explorer-critic.html.tt \
    perl-explorer-error.html.tt \
-   perl-explorer-source.html.tt
+   perl-explorer-source.html.tt \
+   includes/perl-explorer-status-message.html.tt \
+   includes/perl-explorer-critic-summary.html.tt \
+   includes/perl-explorer-header.html.tt
+
 
 CONFIG = \
    perl-explorer.json
@@ -50,11 +54,11 @@ RESOURCES = \
 # set your BASE_DIR to the path where your Perl modules live
 BASE_DIR      = "$${BASE_DIR:-$(HOME)/git/perl-explorer/docker}"
 CONFIG_DIR    = "$${CONFIG_DIR:-config}"
-CSS_DIR = "$${CSS_DIR:-css}"
+CSS_DIR       = "$${CSS_DIR:-css}"
 HTTPD_DIR     = "$${HTTPD_DIR:-httpd}"
-IMG_DIR = "$${IMG_DIR:-img}"
+IMG_DIR       = "$${IMG_DIR:-img}"
 JS_DIR        = "$${JS_DIR:-js}"
-MODULES_DIR = "$${MODULES_DIR:-lib/perl5}"
+MODULES_DIR   = "$${MODULES_DIR:-lib/perl5}"
 RESOURCES_DIR = "$${RESOURCES_DIR:-resources}"
 TEMPLATES_DIR = "$${TEMPLATES_DIR:-resources}"
 
@@ -113,7 +117,7 @@ install: check
 	  install -D js/$$a $$base_dir/$$js_dir/$$a; \
 	done; \
 	for a in $(TEMPLATES); do \
-	  install -D templates/$$a $$base_dir/$$templates_dir/$$a; \
+	  install -D templates/$$a $$base_dir/$$templates_dir/$$(basename $$a); \
 	done; \
 	for a in $(CONFIG); do \
 	  install -D $$a $$base_dir/$$config_dir/$$a; \

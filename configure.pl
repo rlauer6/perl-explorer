@@ -45,7 +45,7 @@ sub configure {
     if !-e $config_file;
 
   my $config = eval { slurp_json($config_file); };
-
+  
   die "unable to read $config_file\n$EVAL_ERROR"
     if !$config;
 
@@ -72,7 +72,7 @@ sub configure {
   my $new_config = tt_process( $template, $params );
   $new_config = JSON->new->decode($new_config);
   $new_config->{defaults} = $params->{defaults};
-
+    
   $self->save( $file_list->{ $config->{config_template} }, $new_config );
 
   foreach my $template_file ( keys %{$file_list} ) {
@@ -80,7 +80,7 @@ sub configure {
       
     my $template = slurp_file($template_file);
     $template =~ s/^[#][^\n]*\n//xsmg;
-
+      
     my $dest = $file_list->{$template_file};
     $self->save( $dest, tt_process( $template, $new_config ) );
   }

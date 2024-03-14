@@ -14,7 +14,22 @@ $(document).ready(function () {
   if ( $('.pe-critic-todo').length > 0 ) {
     enable_save_button();
   }
-  
+
+  $('.pe-critic-policy').on('click', function() {
+    var policy = $(this).text();
+
+    $('#diagnostic > h1').text(policy);
+
+    var policy_description = diagnostics[policy];
+
+    console.log(policy);
+    console.log(policy_description);
+
+    $('#diagnostic div > span').html(policy_description);
+
+    open_modal('diagnostic');
+  });
+
   $('.pe-critic-source.tooltip, .pe-critic-description.tooltip').hover(
     function () {
       var spans = $(this).children('span');
@@ -154,7 +169,7 @@ function save_todos() {
   // - add spinner
   
   $.ajax({
-    url: '/explorer/todos',
+    url: '/explorer/source/todos/critic',
     dataType: 'json',
     data: JSON.stringify({
       todos : todos,

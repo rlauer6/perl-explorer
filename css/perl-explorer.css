@@ -10,6 +10,7 @@
     padding: 0px;
     position: relative;
 }
+
 .dir {
     cursor: pointer;
 }
@@ -40,10 +41,6 @@
     width: 100%;
 }
 
-.swervepay_blue {
-    color: #036795;
-}
-
 .menu {
     margin: 0;
     border-radius: 5px;
@@ -54,46 +51,6 @@
     border: solid 1px #aaaaaa;
     background: #333333;
     display: inline-block;
-}
-
-
-#pe-status-message >  button {
-    margin-left: 25px;
-    font-size: 75%;
-}
-
-#pe-status-message {
-    border-radius: 5px;
-    border: solid 2px;
-    border-color: #999999;
-    padding: 8px;
-    font-size: 14px;
-    font-family: monospace;
-    display: none;
-    align-items: center;
-    color: #333;
-}
-
-#pe-status-message span {
-    margin-left: 30px;
-}
-
-.pe-success-message {
-    background: #00aa22;
-    background-image: url('/icons/burst.png');
-    background-repeat: no-repeat;
-    background-position: left 5px center;
-}
-
-.pe-error-message {
-    background: #ff9999;
-    background-image: url('/icons/alert.red.png');
-    background-repeat: no-repeat;
-    background-position: left 5px center;
-}
-
-.pe-alert-message {
-    background: #f6f485;
 }
 
 li.menu:hover {
@@ -141,28 +98,10 @@ li {
     padding-right:10px;
 }
 
-.overlay{
-    display: none;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 999;
-    background: rgba(255,255,255,0.8) url("/static/img/loading-circle-large.gif") center no-repeat;
-}
-
 .severity {
     text-align: center;
 }
 
-body.loading{
-    overflow: hidden;   
-}
-
-body.loading .overlay{
-    display: block;
-}
 
 
 .pe-critic-label {
@@ -352,6 +291,17 @@ li.pe-critic-dependency-item.pe-has-pod:hover {
 
 li.pe-critic-dependency-item:hover {
     color: red;
+}
+
+
+.pe-critic-summary-alert {
+    color: red;
+    font-weight: bold;
+}
+
+.pe-critic-summary-warning {
+    color: orangered;
+    font-weight: bold;
 }
 
 #pe-critic-module-dependency-list li {

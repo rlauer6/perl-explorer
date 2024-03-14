@@ -1,5 +1,67 @@
 body {
     font-size: 16px;
+    background: #eee;
+}
+
+#pe-todo-container {
+    z-index: 999;
+    display: none;
+    background: azure;
+    position: absolute;
+    opacity: 1;
+    padding: 20px 10px 10px 10px;
+    border: 1px solid #555;
+    border-radius: 12px;
+    left: 10%;
+    top:10%
+}
+
+#pe-todo-container textarea {
+    display: block;
+    margin: 15px;
+    padding-bottom: 5px;
+}
+
+.linenum {
+    cursor: pointer;
+}
+
+option {
+    font-family: monospace;
+    font-size: 16px;
+}
+
+#pe-lines {
+    font-family: monospace;
+    font-size: 16px;
+}
+
+#pe-todo-count {
+    font-family: monospace;
+    font-size: 16px;
+}
+
+select {
+    margin-right: 20px;
+}
+
+label[for=pe-todo-count] {
+    background: orangered;
+    color: white;
+    font-weight: bold;
+}
+
+label {
+    border-radius: 4px;
+    border: 1px solid #555;
+    background: antiquewhite;
+    color: black;
+    padding: 3px;
+    font-family: monospace;
+    font-weight: normal;
+    margin-right: 10px;
+    margin-left: 10px;
+
 }
 
 .module:hover {
@@ -8,11 +70,27 @@ body {
     font-size: 130%;
 }
 
-.pe-critic {
-    background: yellow;
-}
 .module {
     cursor: pointer;
+}
+
+#pe-subs-container {
+    overflow: hidden;   
+}
+
+#pe-source {
+    overflow: scroll;
+    height: 100vh;
+    overscroll-behavior: contain;
+    position: fixed;
+}
+
+.pe-linenum-selected {
+    background: yellow;
+}
+
+.pe-critic {
+    background: yellow;
 }
 
 .keyword {

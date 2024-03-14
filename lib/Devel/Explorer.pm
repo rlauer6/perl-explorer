@@ -126,8 +126,10 @@ sub update_pod_status {
 
     if ( $text =~ /^package\s+([^;]+);/xsm ) {
       $package_name = $1;
+      $package_names{$package_name} = $_;
     }
 
+    
     if ( $text && $text =~ /^[=]pod\s*$/xsm ) {
       $pod_status{ $modules->{$_} } = length $text;
     }
@@ -446,8 +448,6 @@ sub directory_index {
   };
 
   my $output = tt_process( $template, $params );
-
-  dbg output => $output, params => $params;
 
   return $output;
 

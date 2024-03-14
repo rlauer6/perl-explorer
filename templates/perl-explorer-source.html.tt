@@ -1,19 +1,59 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    [% FOREACH file IN css -%]
-    <link rel="stylesheet" type="text/css" href="[% file %]">
-    [% END %]
-    [% FOREACH file IN js -%]
-    <script src="[% file %]" type="text/javascript"></script>
-    [% END %]
-    <title>[% module %]</title>
-  </head>
+  [% title = module %]
+
+  [% INCLUDE "perl-explorer-header.html.tt" %]
   
   <body>
-  [% source %]
+    
+    <div id="pe-header-container">
+
+      <label for="pe-subs">Subroutines</label>
+      <select id="pe-subs">
+        <option value="">-- Select --</option>
+        [% FOR s IN subs %]
+        <option value="[% s.0 %]">[% s.1 %]</option>
+        [% END -%]
+      </select>
+
+      
+      <label for="pe-dependencies">Dependencies</label>
+      <select id="pe-dependencies">
+        <option value="">-- Select --</option>
+        [% FOR d IN dependencies.modules %]
+        <option value="[% dependencies.is_local.$d %]">[% d %]</option>
+        [% END -%]
+      </select>
+
+      <label for="pe-lines">Lines</label>
+      <span id="pe-lines">[% lines %]</span>
+
+      <label for="pe-todo-count">TO DOs</label>
+      <span id="pe-todo-count">[% todos %]</span>
+    </div>
+    
+    <hr class="pe-divider" />  
+
+    [% INCLUDE "perl-explorer-status-message.html.tt" %]
+    
+    <div id="pe-source">
+      [% source %]
+    </div>
+    
+    <div id="pe-todo-container">
+      <label for="pe-todo-text">TODO</label>
+      
+      <textarea id="pe-todo-text" rows="5" cols="60"></textarea>
+      
+      <input type="hidden" id="todo-linenum" value="" />
+      
+      <button id="pe-todo-save" class="pe-button">Save</button>
+      <button id="pe-todo-cancel" class="pe-button">Cancel</button>
+    </div>
+    
+    <div class="spinner"></div>
   </body>
+  
 </html>
 

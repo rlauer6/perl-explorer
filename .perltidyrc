@@ -5,7 +5,6 @@
 --perl-best-practices
 # --perl-best-practices --> l=78 i=4 ci=4 st se vt=2 cti=0 pt=1 bt=1 sbt=1 bbt=1 nsfs nolq wbb=% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x=
 # PBP Unchanged
---maximum-line-length=100
 --continuation-indentation=2
 --vertical-tightness=2
 --closing-token-indentation=0
@@ -18,7 +17,8 @@
 --want-break-before="% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x="
 
 # PBP Changed
---indent-columns=2
+--maximum-line-length=125
+--indent-columns=4
 --nostandard-output
 --nostandard-error-output
 

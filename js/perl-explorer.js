@@ -178,20 +178,44 @@ function critique(uri) {
     
     var has_pod = data.summary.has_pod ? 'YES' : 'NO';
 
+    var complexity = data.summary.avg_complexity;
+    
     var is_tidy = data.summary.is_tidy ? 'YES' : 'NO';
     
     $('#pe-critic-module-name').text(data.module);
 
     var rows = $('#pe-critic-summary-detail-table > tbody > tr');
     $(rows).children().each(function () { $(this).remove(); });
+
+    var elem;
     
     append_to_table(rows, data.summary.lines_of_perl);
     append_to_table(rows, dependencies.length);
     append_to_table(rows, data.summary.subs);
-    append_to_table(rows, has_pod);
-    append_to_table(rows, is_tidy);
+    
+    elem = append_to_table(rows, has_pod);
+    
+    if ( has_pod == 'NO' ) {
+      $(elem).children().last().addClass('pe-critic-summary-alert');
+    }
+    
+    elem = append_to_table(rows, is_tidy);
+
+    if ( is_tidy == 'NO' ) {
+      $(elem).children().last().addClass('pe-critic-summary-alert');
+    }
+    
     append_to_table(rows, data.summary.total);
-    append_to_table(rows, data.summary.avg_complexity);
+
+    elem = append_to_table(rows, data.summary.avg_complexity);
+    
+    if ( complexity > 4 && complexity < 6)  {
+      $(elem).children().last().addClass('pe-critic-summary-warning');
+    }
+    else if ( complexity > 6 ) {
+      $(elem).children().last().addClass('pe-critic-summary-alert');
+    }
+         
         
     $('#pe-critic-module-violations span').each(function(index, severity) {
       $(severity).text('Severity ' + (index + 1) + ' (' + data.summary.violations[index + 1] + ')');
@@ -243,9 +267,8 @@ function critique(uri) {
 // ########################################################################
 function append_to_table (tr, text) {
 // ########################################################################
-  $(tr).append('<td>' + text + '</td>');
+  return $(tr).append('<td>' + text + '</td>');
 }
-
 
 
 // ########################################################################
