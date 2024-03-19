@@ -1,0 +1,7 @@
+<h3 class="dir" id="[% id %]">
+  <span style="display:inline-block; text-align:center;">
+    <img class="folder" src="/icons/folder.png" style="display:inline-block; padding-right:10px;">
+    <img class="folder" src="/icons/folder.open.png" style="display:none; padding-right:10px;">
+    %s
+  </span>
+</h3>

@@ -11,12 +11,15 @@ BEGIN {
 
 use Apache2::Log;
 use Apache2::Request;
+use Carp;
+use Carp::Always;
 use Data::Dumper;
 use Devel::Explorer::Utils qw(:all);
 use Devel::Explorer;
-use Devel::Explorer::Source;
 use Devel::Explorer::Critic;
 use Devel::Explorer::PodWriter qw(pod2html);
+use Devel::Explorer::Search;
+use Devel::Explorer::Source;
 use Devel::Explorer::Tidy;
 use Devel::Explorer::ToDo;
 use English qw(-no_match_vars);
@@ -128,6 +131,10 @@ sub handler {
         return api_todos( $r, explorer => $explorer, critic => $TRUE );
     }
 
+    if ( $uri_path =~ /source\/search/xsm ) {
+        return api_search( $r, explorer => $explorer );
+    }
+
     if ( $uri_path =~ /^pod\/(.+)$/xsm ) {
         return show_pod( $r, module => $1, explorer => $explorer );
     }
@@ -227,10 +234,98 @@ sub api_todos {
             no_critic => $no_critic
         );
 
-        $todos->save_todos($no_critic);
+        my $retval = eval { return $todos->save_todos($no_critic); };
 
-        output_json( $r, { status => $HTTP_OK } );
+        my $error = $EVAL_ERROR // $EMPTY;
+
+        my $status = $retval ? $HTTP_OK : $SERVER_ERROR;
+
+        output_json(
+            $r,
+            {   status     => $status,
+                error      => $error,
+                html_error => to_html($error),
+            },
+            $status,
+        );
+
     }
+
+    return $OK;
+}
+
+########################################################################
+sub api_search {
+########################################################################
+    my ( $r, @args ) = @_;
+
+    my $options = get_args(@args);
+
+    my ($explorer) = @{$options}{qw(explorer)};
+
+    my $req = Apache2::Request->new($r);
+
+    my $repo_search = $req->param('repo-search');
+    my $is_regexp   = $req->param('regexp');
+    my $search_term = $req->param('search-term');
+    my $module      = $req->param('module');
+
+    dbg
+      repo_search => $repo_search,
+      is_regexp   => $is_regexp,
+      term        => $search_term,
+      module      => $module;
+
+    my $source = eval { return fetch_source_from_module( explorer => $explorer, module => $module ); };
+
+    if ( !$source || $EVAL_ERROR ) {
+        output_json( $r, { error => 'not found' }, $NOT_FOUND );
+        return $OK;
+    }
+
+    my $source_explorer = Devel::Explorer::Search->new( source => $source );
+
+    my $term_type = $is_regexp ? 'regexp' : 'text';
+
+    my $result;
+
+    my %package_names = reverse %{ $explorer->get_package_names };
+
+    if ($repo_search) {
+        $result = $source_explorer->search_all(
+            explorer   => $explorer,
+            $term_type => $search_term,
+            callback   => sub {
+                my ( $file, $results ) = @_;
+
+                my $package_name = $package_names{$file};
+
+                if ( !$package_name ) {
+                    carp 'no package name for ' . $file;
+                }
+
+                $results->{$file} = [ $results->{$file}, $package_name ];
+
+                return;
+            }
+
+        );
+
+        my $modules = [];
+
+        if ( %{$result} ) {
+            foreach my $file ( keys %{$result} ) {
+                push @{$modules}, $result->{$file};
+            }
+
+            $result = [ sort { $a->[1] cmp $b->[1] } @{$modules} ];
+        }
+    }
+    else {
+        $result = $source_explorer->search( $term_type => $search_term );
+    }
+
+    output_json( $r, $result );
 
     return $OK;
 }
@@ -619,6 +714,8 @@ sub show_source {
 
     my $source = eval { fetch_source_from_module( explorer => $explorer, module => $module ); };
 
+    dbg source => $source;
+
     if ( !$source || $EVAL_ERROR ) {
         html_error(
             $r,
@@ -633,14 +730,24 @@ sub show_source {
     my $source_explorer = Devel::Explorer::Source->new(
         source       => $source,
         config       => $config,
+        module       => $module,
         use_template => $TRUE,
     );
 
-    my $dependencies = create_dependency_listing( source => $source, explorer => $explorer );
-    my $todos        = 0;
+    my $dependencies = $source_explorer->create_dependency_listing(
+        module   => $module,
+        source   => $source,
+        explorer => $explorer
+    );
+
+    my $todos = 0;
 
     while ( $source =~ /[#][#]\sno\scritic[^\n]+\n/xsgm ) { ++$todos; }
     while ( $source =~ /[#][#]\sTODO[^\n]+\n/xsgm )       { ++$todos; }
+
+    my $req = Apache2::Request->new($r);
+
+    my $linenum = $req->param('linenum') // 1;
 
     output_html(
         $r,
@@ -648,6 +755,7 @@ sub show_source {
             module       => $module,
             dependencies => $dependencies,
             todos        => $todos,
+            linenum      => $linenum,
         )
     );
 
@@ -697,10 +805,12 @@ sub critique {
     my ( $module, $explorer ) = @{$options}{qw(module explorer)};
     my $config = $explorer->get_config;
 
+    my $source = fetch_source_from_module( explorer => $explorer, module => $module );
+
     my $critic = Devel::Explorer::Critic->new(
         module => $module,
         config => $config,
-        source => scalar fetch_source_from_module( explorer => $explorer, module => $module ),
+        source => $source,
     );
 
     my $violations = $critic->critique();
@@ -713,15 +823,18 @@ sub critique {
     # see if this module has pod
     $stat_summary->{has_pod} = $explorer->has_pod($module);
 
+    my $source_explorer = Devel::Explorer::Source->new( source => $source, config => $config );
+
     # get the list of dependencies
-    $stat_summary->{dependency_listing} = create_dependency_listing(
+    $stat_summary->{dependency_listing} = $source_explorer->create_dependency_listing(
         explorer => $explorer,
-        critic   => $critic
+        source   => $source,
+        module   => $module,
     );
 
     # see if module is tidy
     $stat_summary->{is_tidy} = Devel::Explorer::Tidy->new(
-        source => $critic->get_source,
+        source => $source,
         config => $config->{tidy},
     )->tidy();
 
@@ -732,40 +845,6 @@ sub critique {
         module     => $module,
         violations => $violation_summary,
         critic     => $critic,
-    };
-}
-
-########################################################################
-sub create_dependency_listing {
-########################################################################
-    my (@args) = @_;
-
-    my $options = get_args(@args);
-
-    my ( $critic, $explorer, $source ) = @{$options}{qw(critic explorer source)};
-
-    if ( !$source && $critic ) {
-        $source = $critic->get_source;
-    }
-    elsif ( !$source ) {
-        die "no source\n";
-    }
-
-    my $dependencies = find_requires($source);
-
-    my $has_pod       = {};
-    my $is_local      = {};
-    my @package_names = keys %{ $explorer->get_package_names };
-
-    foreach my $m ( @{$dependencies} ) {
-        $has_pod->{$m}  = $explorer->has_pod($m);
-        $is_local->{$m} = ( any { $m eq $_ } @package_names ) ? $TRUE : $FALSE;
-    }
-
-    return {
-        modules  => $dependencies,
-        has_pod  => $has_pod,
-        is_local => $is_local,
     };
 }
 

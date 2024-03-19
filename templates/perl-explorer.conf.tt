@@ -1,4 +1,4 @@
-PerlSwitches -I [% perl5libdir %]
+[% IF perl5libdir %]PerlSwitches -I [% perl5libdir %][% END %]
 
 <Location '/explorer'>
   PerlSetEnv CONFIG  [% defaults.sitedir %]/perl-explorer.json

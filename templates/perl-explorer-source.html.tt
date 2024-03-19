@@ -8,7 +8,8 @@
   <body>
     
     <div id="pe-header-container">
-
+      <i class="pe-pager fas fa-caret-down"></i>
+      
       <label for="pe-subs">Subroutines</label>
       <select id="pe-subs">
         <option value="">-- Select --</option>
@@ -26,11 +27,22 @@
         [% END -%]
       </select>
 
+      <label for="pe-reverse-dependencies">Used In</label>
+      <select id="pe-reverse-dependencies">
+        <option value="">-- Select --</option>
+        [% FOR m IN dependencies.reverse_dependencies.keys() %]
+        <option value="[% m %]">[% m %]</option>
+        [% END -%]
+      </select>
+
       <label for="pe-lines">Lines</label>
       <span id="pe-lines">[% lines %]</span>
 
       <label for="pe-todo-count">TO DOs</label>
       <span id="pe-todo-count">[% todos %]</span>
+
+      <i id="pe-search-icon" class="fa fa-search-plus fa-lg"></i>
+      <i id="pe-source-info-icon" class="fa fa-info-circle fa-lg"></i>
     </div>
     
     <hr class="pe-divider" />  
@@ -52,7 +64,86 @@
       <button id="pe-todo-cancel" class="pe-button">Cancel</button>
     </div>
     
+    <div id="pe-search-container">
+
+      <div>
+        <label for="pe-repo-search">Search Repo</label>
+        <input type="checkbox" value="1" name="repo-search" id="pe-repo-search" />
+      </div>
+      
+      <div>
+        <label for="pe-regexp">Regexp</label>
+        <input type="checkbox" value="1" name="regexp" id="pe-regexp" />
+      </div>
+
+      <div>
+        <label for="pe-search-text">Term or Regexp</label>
+        <input type="text" value="" name="search-text" id="pe-search-text" />
+      </div>
+      
+      <button id="pe-search-search" class="pe-button">Search</button>
+      <button id="pe-search-cancel" class="pe-button">Cancel</button>
+    </div>
+
+    <div id="pe-search-results" >
+      <button id="pe-search-results-cancel" class="pe-button">Cancel</button>
+      
+      <table id="pe-search-results-table" class="display">
+        <thead>
+          <th>Module</th>
+          <th>Line</th>
+          <th>Content</th>
+        </thead>
+        
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="pe-source-info">
+      <h2>Hints & Tips</h2>
+      <p>
+        <i class="fa fa-info fa-lg"></i>
+        Click on line numbers to add a TODO comment to the source.
+      </p>  
+
+      <p>
+        <i class="fa fa-info fa-lg"></i>
+        Select a subroutine to move to that spot in the code. Select
+        '-- Select --' to return to top.
+      </p>
+
+      <p>
+        <i class="fa fa-info fa-lg"></i>
+        Select a dependency to display that module. Selecting an external
+        dependencies will display their POD.
+      </p>
+      
+      <p>
+        <i class="fa fa-info fa-lg"></i>
+      "Used In" shows modules that use this module. Selecting one will
+      open that module.
+      </p>
+      
+      <p>
+        <i class="fa fa-info fa-lg"></i>
+        Click the search icon <i class="fa fa-search-plus"></i> to
+        search this file or the entire repo. Use a regular expression
+        like "/(foo|bar)/i" to using a regexp. The result lists for
+        repo search will allow you to navigate to the file by clicking
+        on the module name or line number.
+      </p>
+
+      <button class="pe-button">OK</button>
+
+    </div>
+    
     <div class="spinner"></div>
+    
+    <div class="overlay"></div>
+    
+    <script>var linenum = [% linenum %];</script>
+    
   </body>
   
 </html>

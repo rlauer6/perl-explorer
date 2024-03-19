@@ -6,6 +6,11 @@
     "datadir" : "/usr/local/share/perl-explorer",
     "repo" : ""
   },
+  "theme" : {
+    "color": "[% defaults.theme.color %]",
+    "logo" : "[% defaults.theme.logo %]",
+    "spinner" : "[% defaults.theme.spinner %]"
+  },
   "perl5libdir" : "[% defaults.sitedir %]/lib",  
   "templates" : {
     "source" : "[% defaults.datadir %]/perl-explorer-source.html.tt",
@@ -19,7 +24,8 @@
   "index" : {
     "css" : [
       "perl-explorer.css",
-      "perl-explorer-common.css"
+      "perl-explorer-common.css",
+      "//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     ],
     "js" : [
       "//code.jquery.com/jquery-3.7.1.min.js",
@@ -39,12 +45,15 @@
     "line_numbers" : 1,
     "js" : [
       "//code.jquery.com/jquery-3.7.1.min.js",
+      "//cdn.datatables.net/2.0.1/js/dataTables.min.js",
       "perl-explorer-source.js",
       "perl-explorer-common.js"
     ],
     "css" : [
       "perl-explorer-source.css",
-      "perl-explorer-common.css"
+      "perl-explorer-common.css",
+      "//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css",
+      "//cdn.datatables.net/2.0.1/css/dataTables.dataTables.min.css"
     ]
   },
   "pod" : {
@@ -65,7 +74,8 @@
       "perl-explorer-common.css",
       "perl-explorer-critic.css",
       "perl-explorer-source.css",
-      "//cdn.datatables.net/2.0.1/css/dataTables.dataTables.min.css"
+      "//cdn.datatables.net/2.0.1/css/dataTables.dataTables.min.css",
+      "//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     ],
     "verbose" : 11
   }

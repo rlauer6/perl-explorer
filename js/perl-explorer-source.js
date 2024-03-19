@@ -5,7 +5,7 @@
 
 // ########################################################################
 $(document).ready(function () {
-// ########################################################################
+  // ########################################################################
 
   var comments = $('span.comment').filter(function() {
     return  $(this).text().indexOf('no critic') > -1;
@@ -33,8 +33,33 @@ $(document).ready(function () {
   });
 
   $('#pe-todo-save').on('click', function() {
-    save_todo();
     close_modal('pe-todo-container');
+
+    save_todo();
+  });
+
+  $('#pe-source-info-icon').on('click', function() {
+    open_modal('pe-source-info');
+  });
+
+  $('#pe-source-info button').on('click', function() {
+    close_modal('pe-source-info');
+  });
+  
+  $('#pe-search-cancel').on('click', function() {
+    close_modal('pe-search-container');
+  });
+  
+  $('#pe-search-search').on('click', function() {
+    search_text();
+  });
+
+  $('#pe-search-icon').on('click', function() {
+    open_modal('pe-search-container');
+  });
+
+  $('#pe-search-results-cancel').on('click', function() {
+    close_modal('pe-search-results');
   });
 
   // ###################################################################
@@ -55,7 +80,35 @@ $(document).ready(function () {
     
   });
 
-  location.href = '#pe-1'; // always start at first line
+  // ###################################################################
+  // reverse dependencies dropdown
+  // ###################################################################
+
+  $('#pe-reverse-dependencies').on('change', function () {
+    
+    module = $('#pe-reverse-dependencies option:selected').text();
+    
+    if ( module != '-- Select --' ) {
+      window.open('/explorer/source/' + module, '_blank');
+    }
+    
+  });
+
+  $('#pe-reverse-dependencies').val('').prop('selected', true);
+
+  
+  if (linenum && linenum != 1) {
+    highlight_line(linenum);
+    
+    show_page_up();
+  }
+  else {
+    location.href = '#pe-1'
+    
+    show_page_down();
+  }
+  
+  lineum = 1;
   
   // ###################################################################
   // subs dropdown
@@ -65,33 +118,82 @@ $(document).ready(function () {
     if ( !this.value ) {
       location.href = '#pe-1';
       
-      $('.pe-linenum-selected').each(function () { $(this).removeClass('pe-linenum-selected'); } );
+      remove_highlights();
       
       return;
     }
     
-    var linenum = this.value + ':';
+    var linenum = parseInt(this.value);
 
-    var anchor = '#pe-' + parseInt(this.value);
-
-    var elem = $('.linenum').filter(function () { return $(this).text().indexOf(linenum) > -1});
-    
-    $('.pe-linenum-selected').each(function () { $(this).removeClass('pe-linenum-selected'); } );
-    
-    $(elem).addClass('pe-linenum-selected');
-
-    location.href = anchor;
-    
-    elem = $(elem).parent().next();
-        
-    while (elem && ! $(elem).is('a') ) {
-      console.log($(elem).attr('class'));
-      $(elem).addClass('pe-linenum-selected');
-      elem = $(elem).next();
-    }
+    highlight_line(linenum);
   });
 });
 
+
+// #####################################################################
+function remove_highlights() {
+// #####################################################################
+  $('.pe-linenum-selected').removeClass('pe-linenum-selected');
+}
+
+// #####################################################################
+function highlight_line(linenum) {
+// #####################################################################
+  var anchor = '#pe-' + linenum;
+  
+  var elem = $('a[name="pe-' + linenum + '"]');
+
+  remove_highlights();
+    
+  $(elem).addClass('pe-linenum-selected');
+  
+  elem = $(elem).next();
+  
+  while (elem && ! $(elem).is('a') ) {
+
+    $(elem).addClass('pe-linenum-selected');
+    elem = $(elem).next();
+  }
+  
+  show_page_up();
+
+  location.href = anchor;
+}
+
+
+// #####################################################################
+function show_page_up() {
+// #####################################################################
+  $('.pe-pager').removeClass('fa-caret-down');
+  $('.pe-pager').addClass('fa-caret-up');
+
+  $('.pe-pager').off('click');
+  
+  $('.pe-pager').on('click', function() {
+
+    location.href = '#pe-1';
+
+    show_page_down();
+  });
+}
+
+// #####################################################################
+function show_page_down() {
+// #####################################################################
+  remove_highlights();
+  
+  $('.pe-pager').removeClass('fa-caret-up');
+  $('.pe-pager').addClass('fa-caret-down');
+
+  $('.pe-pager').off('click');
+
+  $('.pe-pager').on('click', function() {
+
+    location.href = '#pe-' + $('tt a').length;
+    
+    show_page_up();
+  });
+}
 
 // #####################################################################
 function save_todo() {
@@ -102,8 +204,6 @@ function save_todo() {
     todos : [ $('#todo-linenum').val(), $('#pe-todo-text').val() ],
     module: $('title').text()
   };
-  
-  console.log(data);
   
   $('body').addClass('loading');
   
@@ -116,15 +216,23 @@ function save_todo() {
   }).done(function (data) {
     $('body').removeClass('loading');
 
-    display_success_message('Successfully saved your TODO!', function () {
+    display_success_message('Successfully saved your TODO!', true, function () {
+      $('body').addClass('loading');
       location.reload(0);
     });
 
     return true;
   }).fail(function($xhr, status, error) {
 
+    console.log($xhr);
+    console.log(status);
+    console.log(error);
+
+    data = $xhr.responseJSON;
+    
     $('body').removeClass('loading');
-    display_error_message('Error saving your TODOs!');
+
+    display_error_message(data.html_error, true, null);
     
     return false;
   });
@@ -132,3 +240,120 @@ function save_todo() {
   
   return;
 }
+
+// #####################################################################
+function search_text() {
+// #####################################################################
+  var text = $('#pe-search-text').val();
+
+  var is_repo_search = $('#pe-repo-search').is(":checked");
+
+  var repo_search = is_repo_search ? 1 : 0;
+
+  var regexp = $('#pe-regexp').is(":checked");
+
+  regexp = regexp ? 1 : 0;
+  
+  var module = $('title').text();
+  
+  close_modal('pe-search-container');
+  
+  $('body').addClass('loading');
+  
+  $.ajax({
+    url: '/explorer/source/search',
+    data: {
+      'repo-search': repo_search,
+      'search-term': text,
+      'regexp': regexp,
+      'module': module
+    }
+  }).done(function (data) {
+
+    console.log(data);
+    
+    $('body').removeClass('loading');
+
+    $('#pe-search-results-table').DataTable().destroy();
+
+    $('#pe-search-results-table tbody').replaceWith('<tbody></tbody>');
+
+    if ( repo_search ) {
+      if ( !data.length ) {
+        display_error_message('nothing found');
+      }
+      
+      data.forEach(function(result) {
+        var module = result[1];
+        var module_result = result[0];
+        
+        module_result.forEach(function(result) {
+          add_row(module, result);
+        });
+      });
+
+      $('.pe-search-module').off('click');
+      
+      $('.pe-search-module').on('click', function() {
+        var linenum = $(this).next().text();
+        var url = '/explorer/source/' + $(this).text() + '?linenum=' + linenum;
+        
+        window.open(url, '_blank');
+      });
+    }
+    else {
+      data.forEach(function(result) {
+        add_row(module, result);
+      });
+
+      $('.pe-search-linenum, .pe-search-module').off('click');
+
+      $('.pe-search-linenum, .pe-search-module').on('click', function() {
+        
+        var linenum = $(this).parent().find('.pe-search-linenum').text();
+        
+        remove_highlights();
+
+        highlight_line(linenum);
+        
+        linenum = '#pe-' + linenum;
+        
+        location.href = linenum;
+      });
+    }
+    
+    $('#pe-search-results-table').DataTable({
+      bAutoWidth: false,
+      columns: [ null, null, { width: "100%" } ]
+    });
+
+    open_modal('pe-search-results');
+    
+    return true;
+  }).fail(function($xhr, status, error) {
+
+    console.log($xhr);
+    console.log(status);
+    console.log(error);
+    
+    data = $xhr.responseJSON;
+    
+    $('body').removeClass('loading');
+
+    display_error_message(data.html_error, true, null);
+    
+    return false;
+  });
+
+}
+
+           
+// #####################################################################
+function add_row(module, result) {
+// #####################################################################
+  var linenum = result[0];
+  var line = result[1];
+          
+  $('#pe-search-results-table tbody').append('<tr><td class="pe-search-module">' + module + '</td><td class="pe-search-linenum">'+ linenum + '</td><td>' + line + '</td></tr>');
+}
+

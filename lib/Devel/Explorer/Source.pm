@@ -15,13 +15,18 @@ BEGIN {
 
 use Data::Dumper;
 use Devel::Explorer::Utils qw(:all);
-use English                qw(-no_match_vars);
+use Devel::Explorer::Search;
+use Devel::Explorer;
+use List::Util qw(any);
+
+use English qw(-no_match_vars);
 use Syntax::SourceHighlight;
 
 __PACKAGE__->follow_best_practice;
 
 __PACKAGE__->mk_accessors(
     qw(
+      anchored
       css
       css_path
       js
@@ -30,6 +35,7 @@ __PACKAGE__->mk_accessors(
       highlighter
       inputlang
       line_numbers
+      module
       outputlang
       use_template
       template
@@ -171,10 +177,13 @@ sub highlight {
         js           => $self->get_js,
         todos        => $options->{todos},
         subs         => find_subs($source),
+        linenum      => $options->{linenum} // 1,
         module       => $module // $options->{file} // $self->get_file // $EMPTY,
     };
 
     my $output = tt_process( $template, $params );
+
+    dbg output => $output;
 
     return $output;
 }
@@ -201,12 +210,108 @@ sub find_subs {
 }
 
 ########################################################################
+sub create_reverse_dependency_listing {
+########################################################################
+    my ( $self, @args ) = @_;
+
+    my $options = get_args(@args);
+
+    my ( $explorer, $module ) = @{$options}{qw(explorer module)};
+
+    my %package_names = reverse %{ $explorer->get_package_names };
+
+    my $search = Devel::Explorer::Search->new();
+
+    my $found = $search->search_all(
+        regexp   => qr/[^:]$module[^:]/xsm,
+        modules  => $explorer->get_modules,
+        callback => sub {
+            my ( $file, $results ) = @_;
+
+            my $package_name = $package_names{$file};
+
+            $results->{$file} = [ $results->{$file}, $package_name ];
+
+            return;
+        }
+    );
+
+    my $results = {};
+
+    foreach my $file ( keys %{$found} ) {
+        my ( $lines, $found_module ) = @{ $found->{$file} };
+        $results->{$found_module} = [ $lines, $file ];
+    }
+
+    delete $results->{$module};  # module does not depend on module
+
+    return $results;
+}
+
+########################################################################
+sub create_dependency_listing {
+########################################################################
+    my ( $self, @args ) = @_;
+
+    my $options = get_args(@args);
+
+    my ( $explorer, $file, $source, $module ) = @{$options}{qw( explorer file source module)};
+
+    my %package_names = %{ $explorer->get_package_names };
+
+    if ( !$source ) {
+        $file //= $package_names{$module};
+
+        die "no source\n"
+          if !$file || !-e $file;
+
+        $source = slurp_file $file;
+    }
+
+    my $dependencies = find_requires($source);
+
+    my $has_pod  = {};
+    my $is_local = {};
+
+    my @package_names = keys %{ $explorer->get_package_names };
+
+    foreach my $m ( @{$dependencies} ) {
+        $has_pod->{$m}  = $explorer->has_pod($m);
+        $is_local->{$m} = ( any { $m eq $_ } @package_names ) ? $TRUE : $FALSE;
+    }
+
+    my $reverse_dependency_listing = $self->create_reverse_dependency_listing(
+        module   => $module,
+        explorer => $explorer
+    );
+
+    return {
+        reverse_dependencies => $reverse_dependency_listing,
+        modules              => $dependencies,
+        has_pod              => $has_pod,
+        is_local             => $is_local,
+    };
+}
+
+########################################################################
 sub main {
 ########################################################################
 
-    my $file = shift @ARGV;
+    my $explorer = Devel::Explorer->new( config => { path => $ARGV[0] } );
 
-    my $explorer = Devel::Explorer::Source->new( file => $file, use_template => 1 );
+    # my $source_explorer = Devel::Explorer::Source->new( file => $ARGV[0], use_template => 1 );
+
+    my $source_explorer = Devel::Explorer::Source->new( skip_defaults => $TRUE );
+
+    dbg dependencies => $source_explorer->create_dependency_listing(
+        explorer => $explorer,
+        module   => $ARGV[1],
+    );
+
+    #    dbg reverse_dependencies => $source_explorer->reverse_dependency_listing(
+    #        explorer => $explorer,
+    #        module   => $ARGV[1]
+    #    );
 
     return 0;
 }

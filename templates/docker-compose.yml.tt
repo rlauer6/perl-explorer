@@ -22,9 +22,9 @@ services:
       - \${PWD}/httpd/perl-explorer.conf:/etc/httpd/conf.d/perl-explorer.conf
       - \${PWD}/perl-explorer.conf:/etc/httpd/conf.d/perl-explorer.conf
       - \${PWD}/config:[% defaults.sitedir %]/config
-      - \${PWD}/css:[% site.document_root %]/[% site.css %]
-      - \${PWD}/js:[% site.document_root %]/[% site.js %]
-      - \${PWD}/img:[% site.document_root %]/[% site.img %]
+      - \${PWD}/css:[% site.document_root %][% site.css %]
+      - \${PWD}/js:[% site.document_root %][% site.js %]
+      - \${PWD}/img:[% site.document_root %][% site.img %]
       - \${PWD}/resources:[% defaults.datadir %]
       - \${PWD}/lib/perl5:[% perl5libdir %]
       - [% defaults.repo %]:[% defaults.libdir %]

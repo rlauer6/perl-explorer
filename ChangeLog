@@ -1,3 +1,68 @@
+Tue Mar 19 15:14:24 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[searching, tips]:
+	* Makefile
+	- add Devel/Explorer/Search.pm to build
+	- add loading.gif to build
+	* configure.pl
+	- add theme element to default config
+	- add --config-only option
+	* img/loading.gif: new
+	* lib/Devel/Explorer/Search.pm: new
+	* templates/perl-explorer-common.css.tt: new
+	* css/perl-explorer-common.css: styling changes
+	* css/perl-explorer-critic.css: use FontAwesome icons
+	* css/perl-explorer-source.css
+	- use FontAwesome icons
+	- search styling
+	- hints & tips styling
+	- modal container styling
+	* css/perl-explorer.css
+	- align style of buttons
+	* js/perl-explorer-common.js
+	(display_status_message): use FontAwesome icons
+	* js/perl-explorer-critic.js: likewise
+	* js/perl-explorer-source.js
+	- search support
+	- reverse dependency support
+	- hints & tips support
+	- page up/down support
+	* js/perl-explorer.js
+	- use FontAwesome icons
+	* lib/Apache/Devel/Explorer.pm
+	- move create_dependency_listing() to Source.pm
+	(handler)
+	- add search api
+	(api_search): new
+	(show_source): goto linenum
+	* lib/Devel/Explorer.pm
+	(show_branch): use FontAwesome
+	* lib/Devel/Explorer/Base.pm
+	- add skip_defaults option
+	* lib/Devel/Explorer/Source.pm
+	- anchored option
+	(create_dependency_listing): moved here
+	(create_reverse_dependency_listing): new
+	* lib/Devel/Explorer/ToDo.pm
+	(save_todos): return false on error
+	* lib/Devel/Explorer/Utils.pm
+	(to_html): new
+	(replace_file): die on error immediately if we can't create backup
+	* templates/includes/perl-explorer-status-message.html.tt
+	- use FontAwesome icons
+	* templates/perl-explorer-critic.html.tt
+	- likewise
+	- use theme color
+	* templates/perl-explorer-source.html.tt
+	- use FontAwesome icons
+	- add search support
+	- add tips & hint support
+	* templates/perl-explorer.conf.tt: add PerlSwitches conditionally
+	* templates/docker-compose.yml.tt: avoid double slash
+	* templates/perl-explorer.json.tt
+	- theme element
+	- add FontAwesome
+
 Thu Mar 14 16:55:04 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[styling, todo comments, reorg]:

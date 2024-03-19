@@ -22,6 +22,7 @@ use parent qw(Class::Accessor::Fast);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_accessors(
   qw(
+    skip_defaults
     config
     config_file
   )
@@ -38,8 +39,10 @@ sub new {
 
   my $self = $class->SUPER::new($options);
 
-  $self->set_defaults;
-
+  if ( ! $self->get_skip_defaults ) {
+      $self->set_defaults;
+  }
+  
   return $self;
 }
 

@@ -11,6 +11,8 @@
     position: relative;
 }
 
+
+
 .dir {
     cursor: pointer;
 }
@@ -101,8 +103,6 @@ li {
 .severity {
     text-align: center;
 }
-
-
 
 .pe-critic-label {
     padding: 5px;
@@ -210,13 +210,12 @@ h1.pe-critic-heading {
 
 #pe-critic-summary input {
     float: right;
-    color: #555;
+    color: white;
     font-size: 18px;
     font-family: monospace;
-    font-weight: 600;
     padding:  5px 10px 5px 10px;
-    margin: 5px;
-    background: #aaa;
+    margin: 0px 5px 5px 5px;
+    background: #036795;
     border: 1px solid #444;
     border-radius: 5px;
 }

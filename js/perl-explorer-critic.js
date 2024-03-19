@@ -112,13 +112,16 @@ function update_todo_status(line, add_or_delete)  {
 
   if ( add_or_delete ) {
     $(line).addClass('pe-critic-todo');
-    
+    $(line).find('i').addClass(['fa', 'fa-clipboard-list', 'fa-lg']);
+
     if ( status == 0 ) {
       enable_save_button();
     }
   }
   else {
     $(line).removeClass('pe-critic-todo');
+    $(line).find('i').removeClass(['fa', 'fa-clipboard-list', 'fa-lg']);
+
     if (status == 1 ) {
       disable_save_button();
     }

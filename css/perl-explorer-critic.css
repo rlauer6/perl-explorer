@@ -39,11 +39,13 @@ input.pe-button-enabled:hover {
     font-weight: bold;
 }
 
+i.pe-todo-icon {
+    color: #555;
+    margin-right: 3px;
+}
+
 td.pe-critic-todo {
     color: red;
-    background-image: url('/icons/patch.png');
-    background-repeat: no-repeat;
-    background-position: center left 5px;
 }
 
 .source-full {
@@ -76,10 +78,6 @@ td.pe-critic-todo {
     border-radius: 12px;
     
 } 
-
-.pe-status-message-container {
-    margin: 30px 80px 0px 30px;
-}
 
 #diagnostic {
     position: absolute;

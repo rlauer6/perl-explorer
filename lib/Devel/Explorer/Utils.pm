@@ -12,7 +12,8 @@ use JSON;
 use Template;
 use Text::Wrap;
 use Scalar::Util qw(reftype);
-
+use Carp;
+use Carp::Always;
 use Readonly;
 
 Readonly::Scalar our $DOUBLE_COLON => q{::};
@@ -40,6 +41,7 @@ our %EXPORT_TAGS = (
           replace_file
           slurp_file
           slurp_json
+          to_html
           tt_process
           dbg
         )
@@ -84,6 +86,16 @@ sub is_array {
     my ($obj) = @_;
 
     return $obj && reftype($obj) eq 'ARRAY';
+}
+
+########################################################################
+sub to_html {
+########################################################################
+    my ($str, $options ) = @_;
+
+    $str =~s/\n/<br\/>/xsmg;
+    
+    return $str;
 }
 
 ########################################################################
@@ -205,6 +217,10 @@ sub replace_file {
 
     my $backup = create_backup($infile);
 
+    if ( !$backup ) {
+        die "error creating backup file: $OS_ERROR\n";
+    }
+
     if ($source) {
         my ( $fh, $tmpnam ) = tempfile();
         $outfile = $tmpnam;
@@ -216,18 +232,11 @@ sub replace_file {
         $unlink //= $TRUE;
     }
 
-    if ( !$backup ) {
-        if ($unlink) {
-            unlink $outfile;
-        }
-
-        die "error creating pod file...check permissions: $OS_ERROR\n";
-    }
 
     if ( !copy( $outfile, $infile ) ) {
         rename $backup, $infile;
 
-        die "error creating $infile...check permissions: $OS_ERROR\n";
+        die sprintf "error creating %s: %s\n", $infile, $OS_ERROR;
     }
     elsif ($unlink) {
         unlink $outfile;

@@ -173,13 +173,12 @@ sub save_todos {
                 $commented_source .= sprintf "%s\n", $source[ $linenum - 1 ];
             }
         }
-
-        dbg commented_source => $commented_source;
-
-        return $TRUE;
     }
 
     my $file = $explorer->get_module_path($module);
+
+    return $FALSE
+      if !$commented_source;
 
     replace_file( infile => $file, source => $commented_source );
 

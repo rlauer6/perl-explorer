@@ -5,17 +5,17 @@ use warnings;
 
 package Devel::Explorer::Configure;
 
-use English qw(-no_match_vars);
-use Template;
-use Devel::Explorer::Utils qw(:all);
 use Carp;
 use Cwd;
+use Devel::Explorer::Utils qw(:all);
+use English                qw(-no_match_vars);
+use JSON;
+use Template;
 
 use Readonly;
-use JSON;
 
-Readonly::Scalar our $DEFAULT_CONFIG  => 'defaults.json';
-Readonly::Scalar our $DEFAULT_PORT    => '8080';
+Readonly::Scalar our $DEFAULT_CONFIG => 'defaults.json';
+Readonly::Scalar our $DEFAULT_PORT   => '8080';
 
 use parent qw(CLI::Simple);
 
@@ -24,115 +24,122 @@ caller or __PACKAGE__->main();
 ########################################################################
 sub init {
 ########################################################################
-  my ($self) = @_;
+    my ($self) = @_;
 
-  return $TRUE;
+    return $TRUE;
 }
 
 ########################################################################
 sub configure {
 ########################################################################
-  my ($self) = @_;
+    my ($self) = @_;
 
-  croak "--repo is a required argument\n"
-    if !$self->get_repo;
+    croak "--repo is a required argument\n"
+      if !$self->get_repo;
 
-  my $cwd = getcwd;
+    my $cwd = getcwd;
 
-  my $config_file = $self->get_config // 'defaults.json';
+    my $config_file = $self->get_config // 'defaults.json';
 
-  die "no config file\n"
-    if !-e $config_file;
+    die "no config file\n"
+      if !-e $config_file;
 
-  my $config = eval { slurp_json($config_file); };
-  
-  die "unable to read $config_file\n$EVAL_ERROR"
-    if !$config;
+    my $config = eval { slurp_json($config_file); };
 
-  foreach (qw(defaults config_template files)) {
-    die "no $_ defined in config file\n"
-      if !$config->{$_};
-  }
+    die "unable to read $config_file\n$EVAL_ERROR"
+      if !$config;
 
-  my $file_list = $config->{files};
-  my $defaults  = $config->{defaults};
-
-  my $params = {
-    defaults => {
-      libdir  => $self->get_libdir  // $defaults->{libdir},
-      sitedir => $self->get_sitedir // $defaults->{sitedir},
-      repo    => $self->get_repo    // $defaults->{repo},
-      datadir => $self->get_datadir // $defaults->{datadir},
-      port    => $self->get_port    // $defaults->{port},
+    foreach (qw(defaults config_template files)) {
+        die "no $_ defined in config file\n"
+          if !$config->{$_};
     }
-  };
 
-  my $template   = slurp_file( $config->{config_template} );
+    my $file_list = $config->{files};
+    my $defaults  = $config->{defaults};
 
-  my $new_config = tt_process( $template, $params );
-  $new_config = JSON->new->decode($new_config);
-  $new_config->{defaults} = $params->{defaults};
-    
-  $self->save( $file_list->{ $config->{config_template} }, $new_config );
+    my $params = {
+        defaults => {
+            libdir  => $self->get_libdir  // $defaults->{libdir},
+            sitedir => $self->get_sitedir // $defaults->{sitedir},
+            repo    => $self->get_repo    // $defaults->{repo},
+            datadir => $self->get_datadir // $defaults->{datadir},
+            port    => $self->get_port    // $defaults->{port},
+            theme   => $defaults->{theme},
+        }
+    };
 
-  foreach my $template_file ( keys %{$file_list} ) {
-    next if $template_file eq $config->{config_template};
-      
-    my $template = slurp_file($template_file);
-    $template =~ s/^[#][^\n]*\n//xsmg;
-      
-    my $dest = $file_list->{$template_file};
-    $self->save( $dest, tt_process( $template, $new_config ) );
-  }
+    my $template = slurp_file( $config->{config_template} );
 
-  return 0;
+    my $new_config = tt_process( $template, $params );
+
+    $new_config = JSON->new->decode($new_config);
+
+    $new_config->{defaults} = $params->{defaults};
+
+    $self->save( $file_list->{ $config->{config_template} }, $new_config );
+
+    return 0
+      if $self->get_config_only;
+
+    foreach my $template_file ( keys %{$file_list} ) {
+        next if $template_file eq $config->{config_template};
+
+        my $template = slurp_file($template_file);
+        $template =~ s/^[#][^\n]*\n//xsmg;
+
+        my $dest = $file_list->{$template_file};
+        $self->save( $dest, tt_process( $template, $new_config ) );
+    }
+
+    return 0;
 }
 
 ########################################################################
 sub save {
 ########################################################################
-  my ( $self, $file, $content ) = @_;
+    my ( $self, $file, $content ) = @_;
 
-  create_backup($file);
+    create_backup($file);
 
-  if ( ref $content ) {
-    $content = JSON->new->pretty($TRUE)->encode($content);
-  }
+    if ( ref $content ) {
+        $content = JSON->new->pretty($TRUE)->encode($content);
+    }
 
-  open my $fh, '>', $file
-    or croak "could not open $file for writing\n$OS_ERROR";
+    open my $fh, '>', $file
+      or croak "could not open $file for writing\n$OS_ERROR";
 
-  print {$fh} $content;
+    print {$fh} $content;
 
-  return close $fh;
+    return close $fh;
 }
 
 ########################################################################
 sub main {
 ########################################################################
 
-  my @option_specs = qw(
-    help
-    repo|r=s
-    sitedir=s
-    libdir=s
-    datadir=s
-    config=s
-    port=s
-    replace|R
-  );
+    my @option_specs = qw(
+      help
+      repo|r=s
+      sitedir=s
+      libdir=s
+      datadir=s
+      config=s
+      port=s
+      config-only
+      replace|R
+    );
 
-  Getopt::Long::Configure('no_ignore_case');
+    Getopt::Long::Configure('no_ignore_case');
 
-  return __PACKAGE__->new(
-    option_specs    => \@option_specs,
-    extra_options   => [],
-    default_options => {
-      port    => $DEFAULT_PORT,
-      config  => $DEFAULT_CONFIG,
-    },
-    commands => { configure => \&configure, },
-  )->run;
+    return __PACKAGE__->new(
+        option_specs    => \@option_specs,
+        extra_options   => [],
+        default_options => {
+            port   => $DEFAULT_PORT,
+            config => $DEFAULT_CONFIG,
+        },
+        commands => { configure => \&configure, },
+    )->run;
 }
 
 exit main();

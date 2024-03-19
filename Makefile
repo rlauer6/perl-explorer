@@ -6,12 +6,13 @@ PERLMODULES = \
     Apache/Devel/Explorer.pm \
     Devel/Explorer.pm \
     Devel/Explorer/Base.pm \
-    Devel/Explorer/Utils.pm \
-    Devel/Explorer/Source.pm \
     Devel/Explorer/Critic.pm \
     Devel/Explorer/PodWriter.pm \
+    Devel/Explorer/Search.pm \
+    Devel/Explorer/Source.pm \
     Devel/Explorer/Tidy.pm \
-    Devel/Explorer/ToDo.pm
+    Devel/Explorer/ToDo.pm \
+    Devel/Explorer/Utils.pm
 
 HTTPD = \
     httpd.conf \
@@ -31,7 +32,8 @@ JS = \
    perl-explorer-source.js
 
 IMAGES = \
-   perl-logo.png
+   perl-logo.png \
+   loading.gif
 
 TEMPLATES = \
    perl-explorer-index.html.tt \

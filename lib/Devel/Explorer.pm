@@ -120,24 +120,24 @@ sub update_pod_status {
   my %pod_status;
   my %package_names;
 
-  foreach (@paths) {
-    my $text = eval { return slurp_file($_); };
+  foreach my $file (@paths) {
+    my $text = eval { return slurp_file($file); };
     my $package_name;
-
+    
     if ( $text =~ /^package\s+([^;]+);/xsm ) {
       $package_name = $1;
-      $package_names{$package_name} = $_;
+
+      $package_names{$package_name} = $file;
     }
 
-    
     if ( $text && $text =~ /^[=]pod\s*$/xsm ) {
-      $pod_status{ $modules->{$_} } = length $text;
+      $pod_status{ $modules->{$file} } = length $text;
     }
     else {
-      $pod_status{ $modules->{$_} } = 0;
+      $pod_status{ $modules->{$file} } = 0;
     }
 
-    $pod_status{$package_name} = $pod_status{ $modules->{$_} };
+    $pod_status{$package_name} = $pod_status{ $modules->{$file} };
   }
 
   $self->set_package_names( \%package_names );
@@ -302,13 +302,17 @@ sub show_branch {
 
   my $class = 'branch_' . $id;
 
+#         <span style="display:inline-block; text-align:center;">
+#         <img class="folder" src="/icons/folder.png" style="display:inline-block; padding-right:10px;">
+#         <img class="folder" src="/icons/folder.open.png" style="display:none; padding-right:10px;">
+#         %s
+#       </span>
+
   my $folders = <<"END_OF_HTML";
      <h3 class="dir" id="%s">
-       <span style="display:inline-block; text-align:center;">
-         <img class="folder" src="/icons/folder.png" style="display:inline-block; padding-right:10px;">
-         <img class="folder" src="/icons/folder.open.png" style="display:none; padding-right:10px;">
-         %s
-       </span>
+      <i class="folder fa fa-folder-open" style="display: none;"></i>
+      <i class="folder fa fa-folder"></i>
+      %s
      </h3>
 END_OF_HTML
 

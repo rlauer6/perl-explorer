@@ -10,7 +10,7 @@
     
     <input id="pe-save-button" type="button" value="Save" />
 
-    <div id="diagnostic" class="swervepay-blue">
+    <div id="diagnostic" class="pe-theme-color">
       <h1></h1>
       <div class="pe-diagnostic-message-container">
         <span>this is a more realistic message</span>
@@ -34,7 +34,7 @@
       <tbody>
       [% FOREACH v IN violations %]
         <tr>
-          <td class="pe-critic-linenumber [% x=v.line_number; todos.$x %]">[% v.line_number %]</td>
+          <td class="pe-critic-linenumber [% x=v.line_number; todos.$x %]"><i class="pe-todo-icon"></i>[% v.line_number %]</td>
           <td>[% v.column_number %]</td>
           <td class="severity">[% v.severity %]</td>
           <td class="pe-critic-policy">[% v.policy_short %]</td>
@@ -46,9 +46,12 @@
     </table>
 
     <div id="tooltip-container"></div>
+
+    <div class="overlay"></div>
     
     <script>
       var diagnostics = [% diagnostics_json %];
     </script>
+    
   </body>
 </html>

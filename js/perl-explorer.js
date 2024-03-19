@@ -11,17 +11,11 @@ $(document).ready(function () {
   document.oncontextmenu = function ()  { return false };
   // close all folders
 
-  $('.folder').filter( function () {
-    return $(this).attr('src').indexOf('open') > -1
-  }).each(
-    function() {
-      $(this).css('display', 'none');
-    });
   
   // open root folder
   var first_div = $('#tree').children('div').first();
   first_div.toggle();
-  $('#tree').children().first().find('img').each(function() { $(this).toggle();})
+  $('#tree').children().first().find('.folder').each(function() { $(this).toggle();})
   
   var root = $('#tree').children().first();
   toggle_children(root.next());
@@ -92,7 +86,7 @@ $(document).ready(function () {
   
   $('.dir').on('click', function() {
     toggle_children($(this)); // $(this).next().toggle();
-   $(this).children('span').children('img').each(function() { $(this).toggle(); });
+   $(this).children('i').each(function() { $(this).toggle(); });
   });
   
   $('.module').on('contextmenu', function(e) {

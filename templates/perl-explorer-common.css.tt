@@ -1,5 +1,5 @@
 .theme-color {
-    color: #036795;
+    color: [% theme.color %];
 }
 
 #pe-status-message {
@@ -40,7 +40,7 @@
 }
 
 button.pe-button:hover {
-    background: #036795;
+    background: [% theme.color %];
     color: white;
     font-weight: bold;
 }
@@ -52,7 +52,7 @@ button.pe-button:hover {
     font-family: monospace;
     padding:  5px 10px 5px 10px;
     margin: 0px 5px 5px 5px;
-    background: #036795;
+    background: [% theme.color %];
     border: 1px solid #444;
     border-radius: 5px;
 }
@@ -87,5 +87,5 @@ body.loading .spinner {
     top: 0;
     left: 0;
     z-index: 998;
-    background: rgba(255,255,255,0.8) url("/static/img/loading.gif") center no-repeat;
+    background: rgba(255,255,255,0.8) url("[% site.img %]/[% theme.spinner %]") center no-repeat;
 }
