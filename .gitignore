@@ -6,5 +6,9 @@ docker/perl-base
 docker/img
 docker/css
 docker/html
+docker/httpd
 docker/docker-compose.yml
 perl-explorer.json
+httpd/
+css/perl-explorer-common.css
+
