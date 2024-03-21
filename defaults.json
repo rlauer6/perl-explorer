@@ -3,10 +3,10 @@
   "datadir" : "/usr/local/share/perl-explorer",
   "perl5libdir" : "/usr/local/share/perl-explorer/lib/perl5",
   "sitedir" : "/var/www",
-    "theme" : {
-      "color" : "#036795",
-      "logo" : "perl-logo.png",
-      "spinner": "loading.gif"
+  "theme" : {
+    "color" : "#036795",
+    "logo" : "perl-logo.png",
+    "spinner": "loading.gif"
   },
   "docker" : {
     "repo" : "/perl-explorer",
@@ -29,4 +29,4 @@
     "templates/perl-explorer.conf.tt": "httpd/perl-explorer.conf"
   }
 }
-  
+

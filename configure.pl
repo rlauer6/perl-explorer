@@ -12,7 +12,7 @@ BEGIN {
 use Carp;
 use Cwd;
 use Devel::Explorer::Utils qw(:all);
-use English                qw(-no_match_vars);
+use English qw(-no_match_vars);
 use JSON;
 use Template;
 
@@ -92,7 +92,7 @@ sub configure {
 
         my $template = slurp_file($template_file);
         if ( $template_file !~ /[.css]/xsm ) {
-        $template =~ s/^[#][^\n]*\n//xsmg;
+            $template =~ s/^[#][^\n]*\n//xsmg;
         }
 
         my $dest = $file_list->{$template_file};

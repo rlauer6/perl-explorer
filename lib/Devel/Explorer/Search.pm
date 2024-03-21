@@ -139,7 +139,7 @@ sub search_all {
     my %compiled_results;
 
     foreach my $file (@file_list) {
-        
+
         my $results = $self->search(
             file   => $file,
             text   => $text,
