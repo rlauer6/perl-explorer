@@ -9,17 +9,7 @@ Group apache
 
 ServerAdmin root@localhost
 
-<Directory />
-    AllowOverride none
-    Require all denied
-</Directory>
-
 DocumentRoot "[% site.document_root %]"
-
-<Directory "[% defaults.sitedir %]">
-    AllowOverride None
-    Require all granted
-</Directory>
 
 <Directory "[% site.document_root %]">
     Options Indexes FollowSymLinks
@@ -45,14 +35,15 @@ LogLevel trace8
     <IfModule logio_module>
         LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
     </IfModule>
+
     CustomLog /dev/fd/1 combined
 </IfModule>
 
 <IfModule alias_module>
-    ScriptAlias /cgi-bin/ "[% defaults.sitedir %]/cgi-bin/"
+    ScriptAlias /cgi-bin/ "[% sitedir %]/cgi-bin/"
 </IfModule>
 
-<Directory "[% defaults.sitedir %]/cgi-bin">
+<Directory "[% sitedir %]/cgi-bin">
     AllowOverride None
     Options None
     Require all granted

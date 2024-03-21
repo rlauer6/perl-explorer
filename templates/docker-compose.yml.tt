@@ -13,19 +13,18 @@ services:
       dockerfile: \${PWD}/Dockerfile
     image: "perl-explorer"
     ports:
-      - '[% defaults.port %]:80'
+      - '[% docker.port %]:80'
     expose:
       - 80
     entrypoint: ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
     volumes:
       - \${PWD}/httpd/httpd.conf:/etc/httpd/conf/httpd.conf
       - \${PWD}/httpd/perl-explorer.conf:/etc/httpd/conf.d/perl-explorer.conf
-      - \${PWD}/perl-explorer.conf:/etc/httpd/conf.d/perl-explorer.conf
-      - \${PWD}/config:[% defaults.sitedir %]/config
       - \${PWD}/css:[% site.document_root %][% site.css %]
+      - \${PWD}/config/perl-explorer.json:[% datadir %]/perl-explorer.json
       - \${PWD}/js:[% site.document_root %][% site.js %]
       - \${PWD}/img:[% site.document_root %][% site.img %]
-      - \${PWD}/resources:[% defaults.datadir %]
+      - \${PWD}/resources:[% datadir %]
       - \${PWD}/lib/perl5:[% perl5libdir %]
-      - [% defaults.repo %]:[% defaults.libdir %]
+      - [% repo %]:[% docker.repo %]
       

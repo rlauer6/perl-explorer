@@ -58,7 +58,7 @@ sub new {
   my $path = $self->get_path // $config->{path};
 
   if ($path) {
-    croak "invalid path to repo ($path)\n"
+        croak "invalid path to Perl modules ($path)\n"
       if !-d $path;
 
     find(
@@ -302,11 +302,11 @@ sub show_branch {
 
   my $class = 'branch_' . $id;
 
-#         <span style="display:inline-block; text-align:center;">
-#         <img class="folder" src="/icons/folder.png" style="display:inline-block; padding-right:10px;">
-#         <img class="folder" src="/icons/folder.open.png" style="display:none; padding-right:10px;">
-#         %s
-#       </span>
+    #         <span style="display:inline-block; text-align:center;">
+    #         <img class="folder" src="/icons/folder.png" style="display:inline-block; padding-right:10px;">
+    #         <img class="folder" src="/icons/folder.open.png" style="display:none; padding-right:10px;">
+    #         %s
+    #       </span>
 
   my $folders = <<"END_OF_HTML";
      <h3 class="dir" id="%s">
@@ -332,8 +332,7 @@ END_OF_HTML
       push @li, sprintf '<li %s>%s</li>', $class, $_;
     }
 
-    $options->{html} .= sprintf qq{\n<div class="branch $class">\n<ul>\n%s\n</ul>\n</div>\n},
-      join "\n", @li;
+        $options->{html} .= sprintf qq{\n<div class="branch $class">\n<ul>\n%s\n</ul>\n</div>\n}, join "\n", @li;
   }
 
   return { $this_branch => [@modules] };

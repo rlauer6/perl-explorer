@@ -70,6 +70,7 @@
 --maximum-consecutive-blank-lines=1
 --keep-old-blank-lines=1
 --valign
+--valign-exclusion-list=q
 --memoize
 --pass-version-line
 --nohtml

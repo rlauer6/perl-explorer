@@ -1,25 +1,26 @@
 {
-  "defaults" : {
-    "sitedir" : "/var/www",
-    "libdir" : "/explorer",
-    "port" : "8080",
-    "datadir" : "/usr/local/share/perl-explorer",
-    "repo" : ""
-  },
+  "path" : "[% docker.repo %]",
+  "repo" : "[% repo %]",
+  "datadir" : "[% datadir %]",
+  "perl5libdir" : "[% perl5libdir %]",
+  "sitedir" : "[% sitedir %]",
   "theme" : {
-    "color": "[% defaults.theme.color %]",
-    "logo" : "[% defaults.theme.logo %]",
-    "spinner" : "[% defaults.theme.spinner %]"
+    "color": "[% theme.color %]",
+    "logo" : "[% theme.logo %]",
+    "spinner" : "[% theme.spinner %]"
   },
-  "perl5libdir" : "[% defaults.sitedir %]/lib",  
+  "docker" : {
+    "port" : "[% docker.port %]",
+    "repo" : "[% docker.repo %]"
+  },
   "templates" : {
-    "source" : "[% defaults.datadir %]/perl-explorer-source.html.tt",
-    "critic" : "[% defaults.datadir %]/perl-explorer-critic.html.tt",
-    "index" : "[% defaults.datadir %]/perl-explorer-index.html.tt",
-    "error" : "[% defaults.datadir %]/perl-explorer-error.html.tt"
+    "source" : "[% datadir %]/perl-explorer-source.html.tt",
+    "critic" : "[% datadir %]/perl-explorer-critic.html.tt",
+    "index" : "[% datadir %]/perl-explorer-index.html.tt",
+    "error" : "[% datadir %]/perl-explorer-error.html.tt"
   },
   "tidy" : {
-    "profile" : "[% defaults.datadir %]/.perltidyrc"
+    "profile" : "[% datadir %]/.perltidyrc"
   },
   "index" : {
     "css" : [
@@ -34,13 +35,12 @@
     ]
   },
   "site" : {
-    "document_root": "[% defaults.sitedir %]",
-    "css" : "/static/css",
-    "img" : "/static/img",
-    "js" : "/static/js",
-    "logo" : "/static/img/swerve-logo-top-01.png"
+    "document_root": "[% document_root %]",
+    "css" : "[% site.css %]",
+    "img" : "[% site.img %]",
+    "js" : "[% site.js %]",
+    "logo" : "[% site.img %]/[% theme.logo %]"
   },
-  "path" : "[% defaults.libdir %]",
   "source" : {
     "line_numbers" : 1,
     "js" : [
@@ -69,7 +69,7 @@
       "perl-explorer-common.js"
     ],
     "theme" : "pbp",
-    "profile" : "[% defaults.datadir %]/.perlcriticrc",
+    "profile" : "[% datadir %]/.perlcriticrc",
     "css" : [
       "perl-explorer-common.css",
       "perl-explorer-critic.css",

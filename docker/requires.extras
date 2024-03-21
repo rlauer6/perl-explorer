@@ -4,3 +4,6 @@ JSON
 List::Util
 Module::ScanDeps::Static
 Readonly
+Carp
+Carp::Always
+

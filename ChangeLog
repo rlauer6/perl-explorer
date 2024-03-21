@@ -1,3 +1,36 @@
+Thu Mar 21 08:21:12 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[search]:
+	* js/perl-explorer-source.js
+	- don't make search results a modal so we can scroll lines
+	- for repo search, move to linenum locally if module is current	module
+	- some refactoring
+	- all dragging of the search results modal
+	(move_to_linenum): new
+	(set_linenum_handler): new
+	(handle_mousedown): new
+	* lib/Devel/Explorer/Search.pm
+	(search): compile regexps
+	* defaults.json: make this an example config file
+	* Makefile: add Docker image targets
+	* configure.pl
+	- redo of config files
+	* css/perl-explorer-common.css: removed, now generated
+	* defaults.json
+	- removed defaults object
+	- add docker object
+	- add site object
+	* docker/Dockerfile.perl: type (.d)
+	* docker/Makefile: $$NO_CACHE
+	* docker/requires.extras: add Carp, Carp::Always
+	* lib/Devel/Explorer.pm: whitespace
+	* stop_words: one word per line, add perl?
+	* templates/docker-compose.yml.tt
+	- updates based on revamped config
+	* templates/httpd.conf.tt: likewise
+	* templates/perl-explorer.conf.tt: likewise
+	* templates/perl-explorer.json.tt: likewise
+
 Tue Mar 19 15:14:24 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[searching, tips]:

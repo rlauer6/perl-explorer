@@ -1,3 +1,4 @@
+# need this to enable Community overrides
 exclude = Freenode
 
 [-ValuesAndExpressions::ProhibitConstantPragma]
@@ -19,14 +20,14 @@ exclude_functions = print
 flowcontrol=skip carp cluck confess croak die exit goto warn LOGCROAK LOGCLUCK LOGCARP LOGCONFESS LOGDIE LOGEXIT LOGWARN BAIL_OUT
 
 [CodeLayout::RequireTidyCode]
-perltidyrc=/.perltidyrc
+perltidyrc=/usr/local/share/perl-explorer/.perltidyrc
 
 [Documentation::RequirePodSections]
 lib_sections    = NAME | SYNOPSIS | DESCRIPTION | METHODS AND SUBROUTINES | AUTHOR
 script_sections = NAME | SYNOPSIS | DESCRIPTION | AUTHOR
 
 [Documentation::PodSpelling]
-stop_words_file = /stop_words
+stop_words_file = /usr/local/share/perl-explorer/stop_words
 
 [Community::PreferredAlternatives]
 allowed_modules = JSON Readonly

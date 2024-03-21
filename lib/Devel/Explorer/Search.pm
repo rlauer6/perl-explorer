@@ -34,6 +34,20 @@ sub search {
     if ($text) {
         $regexp = $anchored ? qr/^$text$/ixsm : qr/$text/ixsm;
     }
+    else {
+        if (reftype($regexp) ne 'REGEXP' ) {
+            if ($regexp !~/^qr/xsm ) {
+                $regexp = "qr$regexp";
+            }
+
+            $regexp = eval "$regexp"; ## no critic
+
+            dbg regexp => $regexp;
+        }
+
+        die "not a valid regexp\n"
+          if !$regexp || reftype($regexp) ne 'REGEXP';
+    }
 
     my @source_lines;
 
@@ -54,7 +68,7 @@ sub search {
 
     foreach my $line (@source_lines) {
         ++$linenum;
-        next if $line !~ /$regexp/xsm;
+        next if $line !~ /$regexp/; ## no critic
 
         push @results, [ $linenum, $line ];
     }

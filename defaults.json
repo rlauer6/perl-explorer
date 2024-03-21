@@ -1,13 +1,27 @@
 {
-  "defaults": {
-    "repo" : "/home/rclauer/git/openbedrock/src/main/perl/lib",
-    "sitedir" : "/var/www",
-    "datadir" : "/usr/local/share/perl-explorer",
-    "port" : "8080",
-    "libdir" : "/explorer"
+  "repo" : "",
+  "datadir" : "/usr/local/share/perl-explorer",
+  "perl5libdir" : "/usr/local/share/perl-explorer/lib/perl5",
+  "sitedir" : "/var/www",
+    "theme" : {
+      "color" : "#036795",
+      "logo" : "perl-logo.png",
+      "spinner": "loading.gif"
+  },
+  "docker" : {
+    "repo" : "/perl-explorer",
+    "port" : "8080"
+  },
+  "site" : {
+    "document_root" : "/var/www/html",
+    "img" : "/img",
+    "css" : "/css",
+    "js" : "/js",
+    "html" : ""
   },
   "config_template" : "templates/perl-explorer.json.tt",
   "files": {
+    "templates/perl-explorer-common.css.tt" : "css/perl-explorer-common.css",
     "templates/docker-compose.yml.tt": "docker/docker-compose.yml",
     "templates/perlcriticrc.tt": ".perlcriticrc",
     "templates/perl-explorer.json.tt": "perl-explorer.json",

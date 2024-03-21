@@ -140,3 +140,13 @@ clean:
 	  files=$$(find docker/$$a -type f); \
 	  test -n "$$files" && rm $$files || true; \
 	done
+
+.PHONY: perl-base perl-explorer
+
+perl-base: docker/Dockerfile.perl
+	cd docker; \
+	docker build "$$NO_CACHE" -f Dockerfile.perl . -t perl-base
+
+perl-explorer: docker/Dockerfile
+	cd docker; \
+	docker build "$$NO_CACHE: -f Dockerfile . -t perl-explorer

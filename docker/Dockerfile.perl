@@ -21,7 +21,7 @@ RUN for a in $(cat requires.base | grep -v '^#'); do \
     done
 
 # Perl dependencies - extras
-COPY requires.extras .d
+COPY requires.extras .
 RUN for a in $(cat requires.extras | grep -v '^#'); do \
       cpanm -n -v $a || false; \
     done
