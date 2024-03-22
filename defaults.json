@@ -1,5 +1,9 @@
 {
   "repo" : "",
+  "markdown" : {
+    "path": "",
+    "engine" : "text_markdown"
+  },
   "datadir" : "/usr/local/share/perl-explorer",
   "perl5libdir" : "/usr/local/share/perl-explorer/lib/perl5",
   "sitedir" : "/var/www",
@@ -10,6 +14,7 @@
   },
   "docker" : {
     "repo" : "/perl-explorer",
+    "markdown_path" : "/perl-explorer-markdown",
     "port" : "8080"
   },
   "site" : {

@@ -1,5 +1,9 @@
 {
   "path" : "[% docker.repo %]",
+  "markdown": {
+    "path" : "[% markdown.path %]",
+    "engine" : "[% markdown.method %]"
+  },
   "repo" : "[% repo %]",
   "datadir" : "[% datadir %]",
   "perl5libdir" : "[% perl5libdir %]",
@@ -11,13 +15,16 @@
   },
   "docker" : {
     "port" : "[% docker.port %]",
-    "repo" : "[% docker.repo %]"
+    "repo" : "[% docker.repo %]",
+    "markdown_path" : "[% docker.markdown_path %]"
   },
   "templates" : {
     "source" : "[% datadir %]/perl-explorer-source.html.tt",
     "critic" : "[% datadir %]/perl-explorer-critic.html.tt",
     "index" : "[% datadir %]/perl-explorer-index.html.tt",
-    "error" : "[% datadir %]/perl-explorer-error.html.tt"
+    "error" : "[% datadir %]/perl-explorer-error.html.tt",
+    "configure" : "[% datadir %]/perl-explorer-configure.html.tt",
+    "markdown" : "[% datadir %]/perl-explorer-markdown.html.tt"
   },
   "tidy" : {
     "profile" : "[% datadir %]/.perltidyrc"

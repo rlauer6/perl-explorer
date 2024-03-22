@@ -2,6 +2,14 @@
     margin-left: 0px;
 }
 
+#header {
+    float: left;
+}
+
+#tree {
+    clear: left;
+
+}
 .branch {
     display: none;
     margin-top: 0px;
@@ -11,7 +19,10 @@
     position: relative;
 }
 
-
+#pe-index-top {
+    display: block;
+    float: left;
+}
 
 .dir {
     cursor: pointer;
@@ -266,6 +277,7 @@ h1.pe-critic-heading {
     margin-right: 0px;
     font-family: monospace;
     display: block;
+    cursor: pointer;
 }
 
 #main-container {

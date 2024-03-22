@@ -67,10 +67,12 @@ sub configure {
 
     my $params = $config;
 
-    $params->{document_root}  = $self->get_sitedir // $config->{site}->{document_root};
-    $params->{repo}           = $self->get_repo    // $config->{repo};
-    $params->{datadir}        = $self->get_datadir // $config->{datadir};
-    $params->{docker}->{port} = $self->get_port    // $config->{docker}->{port};
+    $params->{document_root}  = $self->get_sitedir  // $config->{site}->{document_root};
+    $params->{repo}           = $self->get_repo     // $config->{repo};
+    $params->{datadir}        = $self->get_datadir  // $config->{datadir};
+    $params->{docker}->{port} = $self->get_port     // $config->{docker}->{port};
+    $params->{markdown}       = $self->get_markdown // $config->{markdown}->{path};
+    $params->{markdown}->{path} //= $params->{repo};
 
     my $template = slurp_file( $config->{config_template} );
 
@@ -141,11 +143,12 @@ sub main {
     my @option_specs = qw(
       help
       repo|r=s
+      markdown|m=s
       sitedir=s
       datadir=s
       config=s
       port=s
-      config-only
+      config-only|C
       quiet
     );
 

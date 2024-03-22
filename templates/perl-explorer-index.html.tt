@@ -25,7 +25,15 @@
       [% INCLUDE "perl-explorer-status-message.html.tt" %]
       
       [% INCLUDE "perl-explorer-critic-summary.html.tt" %]
-      
+      <div id="pe-index-top">
+        <label for="pe-readme-select">READMEs</label>
+        <select id="pe-readme-select">
+          [% FOREACH r IN readmes %]
+          <option value="[% r %]">[% r %]</option>
+          [% END -%]
+        </select>
+      </div>
+        
       <div id="tree" >
         [% module_listing %]
       </div>
