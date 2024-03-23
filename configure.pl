@@ -67,11 +67,11 @@ sub configure {
 
     my $params = $config;
 
-    $params->{document_root}  = $self->get_sitedir  // $config->{site}->{document_root};
-    $params->{repo}           = $self->get_repo     // $config->{repo};
-    $params->{datadir}        = $self->get_datadir  // $config->{datadir};
-    $params->{docker}->{port} = $self->get_port     // $config->{docker}->{port};
-    $params->{markdown}       = $self->get_markdown // $config->{markdown}->{path};
+    $params->{document_root}    = $self->get_sitedir  // $config->{site}->{document_root};
+    $params->{repo}             = $self->get_repo     // $config->{repo};
+    $params->{datadir}          = $self->get_datadir  // $config->{datadir};
+    $params->{docker}->{port}   = $self->get_port     // $config->{docker}->{port};
+    $params->{markdown}->{path} = $self->get_markdown // $config->{markdown};
     $params->{markdown}->{path} //= $params->{repo};
 
     my $template = slurp_file( $config->{config_template} );

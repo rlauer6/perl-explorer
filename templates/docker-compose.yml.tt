@@ -27,5 +27,5 @@ services:
       - \${PWD}/resources:[% datadir %]
       - \${PWD}/lib/perl5:[% perl5libdir %]
       - [% repo %]:[% docker.repo %]
-      - [% markdown %]:[% docker.markdown %]
+      - [% markdown.path %]:[% docker.markdown_path %]
       

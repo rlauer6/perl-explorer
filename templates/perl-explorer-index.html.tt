@@ -4,18 +4,9 @@
   [% INCLUDE "perl-explorer-header.html.tt" %]
   
   <body>
-    <div id="hb">
-      <label for="cb" style="">&#9776;</label>
-      <input type="checkbox" id="cb"  />
-    </div>
+
+    [% INCLUDE "perl-explorer-hamburger-menu.html.tt" %]
     
-    <div id="hb-menu">
-      <ul id="side-menu" >
-        <li>Configure</li>
-        <li>Help</li>
-      </ul>
-    </div>
-        
     <div id="perl-explorer">
 
       <div id="header">
@@ -25,15 +16,9 @@
       [% INCLUDE "perl-explorer-status-message.html.tt" %]
       
       [% INCLUDE "perl-explorer-critic-summary.html.tt" %]
-      <div id="pe-index-top">
-        <label for="pe-readme-select">READMEs</label>
-        <select id="pe-readme-select">
-          [% FOREACH r IN readmes %]
-          <option value="[% r %]">[% r %]</option>
-          [% END -%]
-        </select>
-      </div>
-        
+
+      [% INCLUDE "perl-explorer-markdown-menu.html.tt" %]
+      
       <div id="tree" >
         [% module_listing %]
       </div>

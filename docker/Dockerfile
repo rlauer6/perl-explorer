@@ -33,6 +33,15 @@ RUN tar xfvz Syntax-SourceHighlight-master.tar.gz; \
     make test && make install
 
 ########################################################################
+# Text::MarkupDiscount
+########################################################################
+RUN yum install -y git
+RUN git clone https://github.com/rlauer6/text-markdown-discount.git; \
+    cd text-markdown-discount; \
+    perl Makefile.PL; \
+    make && make install
+
+########################################################################
 # cleanup
 ########################################################################
 RUN yum remove -y gcc gcc-c++ automake make

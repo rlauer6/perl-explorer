@@ -9,4 +9,5 @@ pkgconfig
 procps
 tar
 tree
-
+openssl
+openssl-devel

@@ -1,11 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css" integrity="sha512-h/laqMqQKUXxFuu6aLAaSrXYwGYQ7qk4aYCQ+KJwHZMzAGaEoxMM6h8C+haeJTU1V6E9jrSUnjpEzX23OmV/Aw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>[% title %]</title>
-  </head>
+
+  [% INCLUDE "perl-explorer-header.html.tt" %]
   
   <body>
-    [% body %]    
+    [% INCLUDE "perl-explorer-markdown-menu.html.tt" %]
+    <div class="markdown-body pe-markdown">
+      [% body %]
+    </div>
   </body>
 </html>

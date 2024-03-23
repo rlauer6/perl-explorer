@@ -17,6 +17,7 @@ use Data::Dumper;
 use Devel::Explorer::Utils qw(:all);
 use Devel::Explorer;
 use Devel::Explorer::Critic;
+use Devel::Explorer::Markdown;
 use Devel::Explorer::PodWriter qw(pod2html);
 use Devel::Explorer::Search;
 use Devel::Explorer::Source;
@@ -127,8 +128,8 @@ sub handler {
     return show_index( $r, $uri )
       if $uri_path =~ /^index/xsm;
 
-    if ( $uri_path =~ /source\/todos\/critic\/?$/xsm ) {
-        return api_todos( $r, explorer => $explorer, critic => $TRUE );
+    if ( $uri_path =~ /markdown(\/?[\da-f]+)?$/xsm ) {
+        return show_markdown( $r, explorer => $explorer, markdown_id => $1 );
     }
 
     if ( $uri_path =~ /source\/search/xsm ) {
@@ -161,6 +162,54 @@ sub handler {
         status   => $NOT_FOUND,
         explorer => $explorer
     );
+}
+
+########################################################################
+sub show_markdown {
+########################################################################
+    my ( $r, @args ) = @_;
+
+    my $options = get_args(@args);
+
+    my ( $explorer, $markdown_id ) = @{$options}{qw(explorer markdown_id)};
+
+    my $md = Devel::Explorer::Markdown->new( config => $explorer->get_config );
+
+    my %markdown_files = %{ $md->get_markdown_files() };
+
+    $markdown_id =~ s/^\///xsm;
+
+    # no id, so look for a README.md in root of markdown path
+    # if we don't find one, then well take the first
+
+    if ( !$markdown_id ) {
+        my $real_path = $explorer->get_config->{markdown}->{path};
+
+        my @readmes = grep {/README[.]md/xsm} values %markdown_files;
+
+        %markdown_files = reverse %markdown_files;
+
+        my $id;
+
+        foreach my $r (@readmes) {
+            $id = $markdown_files{$r};
+
+            $r =~ s/$real_path\///xsm;
+
+            last
+              if $r eq 'README.md';
+        }
+
+        $markdown_id = $id;
+    }
+
+    $markdown_id ||= ( values %markdown_files )[0];
+
+    my $html = $md->render_markdown($markdown_id);
+
+    output_html( $r, $html );
+
+    return $OK;
 }
 
 ########################################################################
@@ -269,12 +318,6 @@ sub api_search {
     my $is_regexp   = $req->param('regexp');
     my $search_term = $req->param('search-term');
     my $module      = $req->param('module');
-
-    dbg
-      repo_search => $repo_search,
-      is_regexp   => $is_regexp,
-      term        => $search_term,
-      module      => $module;
 
     my $source = eval { return fetch_source_from_module( explorer => $explorer, module => $module ); };
 
@@ -713,8 +756,6 @@ sub show_source {
     my $config = $explorer->get_config;
 
     my $source = eval { fetch_source_from_module( explorer => $explorer, module => $module ); };
-
-    dbg source => $source;
 
     if ( !$source || $EVAL_ERROR ) {
         html_error(

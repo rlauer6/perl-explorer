@@ -1,3 +1,42 @@
+Sat Mar 23 07:58:17 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[markdown]:
+	* css/perl-explorer-markdown.css: new
+	* js/perl-explorer-markdown.js: new
+	* templates/includes/perl-explorer-hamburger-menu.html.tt: new
+	* templates/includes/perl-explorer-markdown-menu.html.tt: new
+	* Makefile: add above to build
+	* configure.pl: markdown config
+	* css/perl-explorer.css
+	- removed pe-index-top for now
+	* docker/Dockerfile
+	- Text::Markdown
+	* docker/packages: + openssl, openssl-devel
+	* docker/requires: + LWP::Protocol::https, Text::Markdown::Discount
+	* lib/Apache/Devel/Explorer.pm
+	(handler): /explorer/markdown
+	(show_markdown): new
+	* lib/Devel/Explorer.pm
+	(directory_index): add markdown dropdown
+	* lib/Devel/Explorer/Markdown.pm
+	(set_defaults):
+	- use github engine as default
+	(render_markdown)
+	- add css, js
+	- show real path name, not container path
+	(find_markdown):
+	- add support for ignore paths
+	* templates/docker-compose.yml.tt: markdown conf
+	* templates/httpd.conf.tt: debug, not trace8
+	* templates/perl-explorer-common.css.tt
+	- add CSS for markdown
+	* templates/perl-explorer-index.html.tt
+	- move hamburger menu, markdown dropdown HTML to includes
+	* templates/perl-explorer-markdown.html.tt
+	- move markdown dropdown to include
+	* templates/perl-explorer.json.tt
+	- add csss, js to config object
+
 Thu Mar 21 08:21:12 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[search]:

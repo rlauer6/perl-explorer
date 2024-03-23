@@ -1,0 +1,11 @@
+    <div id="hb">
+      <label for="cb" style="">&#9776;</label>
+      <input type="checkbox" id="cb"  />
+    </div>
+    
+    <div id="hb-menu">
+      <ul id="side-menu" >
+        <li>Configure</li>
+        <li>Help</li>
+      </ul>
+    </div>

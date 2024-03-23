@@ -2,6 +2,8 @@ HTML::Tidy
 Perl::Critic
 Perl::Critic::Policy::Community::PreferredAlternatives
 Perl::Tidy
+LWP::Protocol::https
 Markdown::Render
 Module::ScanDeps::Static
 Template
+Text::Markdown::Discount

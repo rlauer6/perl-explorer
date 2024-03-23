@@ -7,6 +7,7 @@ PERLMODULES = \
     Devel/Explorer.pm \
     Devel/Explorer/Base.pm \
     Devel/Explorer/Critic.pm \
+    Devel/Explorer/Markdown.pm \
     Devel/Explorer/PodWriter.pm \
     Devel/Explorer/Search.pm \
     Devel/Explorer/Source.pm \
@@ -19,16 +20,18 @@ HTTPD = \
     perl-explorer.conf
 
 CSS = \
-    perl-explorer.css \
     perl-explorer-common.css \
-    perl-explorer-source.css \
+    perl-explorer-critic.css \
+    perl-explorer-markdown.css \
     perl-explorer-pod.css \
-    perl-explorer-critic.css
+    perl-explorer-source.css \
+    perl-explorer.css
 
 JS = \
    perl-explorer.js \
    perl-explorer-common.js \
    perl-explorer-critic.js \
+   perl-explorer-markdown.js \
    perl-explorer-source.js
 
 IMAGES = \
@@ -40,10 +43,12 @@ TEMPLATES = \
    perl-explorer-critic.html.tt \
    perl-explorer-error.html.tt \
    perl-explorer-source.html.tt \
+   perl-explorer-markdown.html.tt \
    includes/perl-explorer-status-message.html.tt \
    includes/perl-explorer-critic-summary.html.tt \
+   includes/perl-explorer-markdown-menu.html.tt \
+   includes/perl-explorer-hamburger-menu.html.tt \
    includes/perl-explorer-header.html.tt
-
 
 CONFIG = \
    perl-explorer.json

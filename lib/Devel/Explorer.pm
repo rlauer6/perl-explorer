@@ -16,6 +16,7 @@ BEGIN {
 use Carp;
 use Cwd;
 use Data::Dumper;
+use Devel::Explorer::Markdown;
 use Devel::Explorer::Utils qw(:all);
 use English                qw(-no_match_vars);
 use File::Find;
@@ -442,7 +443,10 @@ sub directory_index {
 
     my $body = $self->directory_index_body($root);
 
+    my $markdown = Devel::Explorer::Markdown->new( config => $config );
+
     my $params = {
+        markdown_files => $markdown->get_markdown_files,
         site           => $config->{site},
         module_listing => $body,
         logo           => $config->{site}->{logo} ? $config->{site}->{logo} : $EMPTY,

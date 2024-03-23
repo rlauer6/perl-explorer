@@ -1,0 +1,10 @@
+<div id="pe-markdown-container">
+  <label for="pe-markdown-select">Markdown</label>
+
+  <select id="pe-markdown-select">
+    [% FOREACH id IN markdown_files.keys() %]
+    <option value="[% id %]">[% markdown_files.$id %]</option>
+    [% END -%]
+  </select>
+  
+</div>

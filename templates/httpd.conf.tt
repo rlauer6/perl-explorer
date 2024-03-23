@@ -26,7 +26,8 @@ DocumentRoot "[% site.document_root %]"
 </Files>
 
 ErrorLog /dev/fd/1
-LogLevel trace8
+
+LogLevel debug
 
 <IfModule log_config_module>
     LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined

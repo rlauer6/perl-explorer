@@ -2,6 +2,27 @@
     color: [% theme.color %];
 }
 
+#pe-markdown-container {
+    display: block;
+    float: left;
+}
+
+#pe-markdown-container label {
+    font-family: monospace;
+    font-size: 125%;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 3px;
+    background: antiquewhite;
+    color: black;
+    margin-left: 20px;
+}
+
+#pe-markdown-container select {
+    font-size: 100%;
+    background: antiquewhite;
+}
+
 #pe-status-message {
     border-radius: 12px;
     border: solid;

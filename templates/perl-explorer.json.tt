@@ -2,7 +2,15 @@
   "path" : "[% docker.repo %]",
   "markdown": {
     "path" : "[% markdown.path %]",
-    "engine" : "[% markdown.method %]"
+    "engine" : "[% markdown.method %]",
+    "css" : [
+      "perl-explorer-common.css",
+      "perl-explorer-markdown.css"
+    ],
+    "js" : [
+      "//code.jquery.com/jquery-3.7.1.min.js",
+      "perl-explorer-markdown.js"
+      ]
   },
   "repo" : "[% repo %]",
   "datadir" : "[% datadir %]",
