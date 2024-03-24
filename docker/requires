@@ -6,4 +6,3 @@ LWP::Protocol::https
 Markdown::Render
 Module::ScanDeps::Static
 Template
-Text::Markdown::Discount

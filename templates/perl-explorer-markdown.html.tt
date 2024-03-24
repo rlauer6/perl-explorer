@@ -4,7 +4,6 @@
   [% INCLUDE "perl-explorer-header.html.tt" %]
   
   <body>
-    [% INCLUDE "perl-explorer-markdown-menu.html.tt" %]
     <div class="markdown-body pe-markdown">
       [% body %]
     </div>

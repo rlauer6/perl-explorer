@@ -28,7 +28,13 @@ body {
 }
 
 #pe-search-container div {
+    display: grid;
+    grid-template-columns: auto 1fr;
     padding: 10px;
+}
+
+#pe-search-container label {
+    width: fit-content;
 }
 
 #pe-search-results {

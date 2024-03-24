@@ -1,5 +1,5 @@
 <div id="pe-markdown-container">
-  <label for="pe-markdown-select">Markdown</label>
+  <button class="pe-button">Markdown</button>
 
   <select id="pe-markdown-select">
     [% FOREACH id IN markdown_files.keys() %]

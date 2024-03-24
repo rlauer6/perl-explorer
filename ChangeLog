@@ -1,3 +1,25 @@
+Sat Mar 23 08:58:15 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[markdown]:
+	* docker/requires
+	- removed Text::Markdown::Discount since we build it from the repo
+	* lib/Devel/Explorer/Markdown.pm
+	(render_markdown): typo
+	* css/perl-explorer-source.css
+	- use grid layout for search container
+	* css/perl-explorer.css
+	- style iframe for markdown
+	* js/perl-explorer.js
+	- handler for markdown select, iframe
+	* templates/includes/perl-explorer-markdown-menu.html.htt
+	- use button for showing markdown
+	* tempaltes/perl-explorer-index.html.tt
+	- add iframe for markdown
+	* templates/perl-explorer-markdown.html.tt
+	- remove markdown menu
+	* templates/perl-explorer-source.html.tt
+	- checkboxes in first column
+
 Sat Mar 23 07:58:17 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[markdown]:
@@ -35,7 +57,26 @@ Sat Mar 23 07:58:17 2024  Rob Lauer  <rlauer6@comcast.net>
 	* templates/perl-explorer-markdown.html.tt
 	- move markdown dropdown to include
 	* templates/perl-explorer.json.tt
-	- add csss, js to config object
+	- add css, js to config object
+
+Fri Mar 22 09:18:06 2024  Rob Lauer  <rlauer6@comcast.net>
+
+        [markdown]:
+        * configure.pl
+        - add markdown
+        - config-only|C
+        * css/perl-explorer.css: float header
+        * defaults.json: add markdown config
+        * lib/Devel/Explorer/Base.pm
+        - added template_name
+        - whitespace
+        (verify_template): set template_name
+        (render): new
+        * templates/docker-compose.yml.tt: markdown path
+        * templates/perl-explorer-index.html.tt: markdown files in header
+        * templates/perl-explorer.json.tt: markdown config
+	* lib/Devel/Explorer/Markdown.pm: new
+	* templates/perl-explorer-markdown.html.tt: new
 
 Thu Mar 21 08:21:12 2024  Rob Lauer  <rlauer6@comcast.net>
 

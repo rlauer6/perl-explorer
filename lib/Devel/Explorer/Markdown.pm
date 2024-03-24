@@ -78,7 +78,7 @@ sub render_markdown {
             infile => $markdown_file,
             body   => $FALSE,
             engine => $self->get_engine,
-            $self->get_enginge eq 'github' ? ( mode => 'gfm' ) : (),
+            $self->get_engine eq 'github' ? ( mode => 'gfm' ) : (),
         );
 
         $md->render_markdown;

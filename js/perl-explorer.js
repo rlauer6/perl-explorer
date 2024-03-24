@@ -10,7 +10,6 @@ $(document).ready(function () {
   // disable context menu
   document.oncontextmenu = function ()  { return false };
   // close all folders
-
   
   // open root folder
   var first_div = $('#tree').children('div').first();
@@ -39,7 +38,9 @@ $(document).ready(function () {
     
   });
                      
+  // ###################################################################
   // hamburger menu
+  // ###################################################################
   $('#side-menu li').on('mouseout', function () {
     $('#hb label').toggle();
     $('#hb-menu').toggle();
@@ -78,7 +79,6 @@ $(document).ready(function () {
       window.open(uri, '_blank');
     }
   });
-
     
   $('#context').on('mouseleave', function() {
     clear_context();
@@ -88,7 +88,27 @@ $(document).ready(function () {
     toggle_children($(this)); // $(this).next().toggle();
    $(this).children('i').each(function() { $(this).toggle(); });
   });
+
+  // ###################################################################
+  // Markdown
+  // ###################################################################
+  $('#pe-markdown-iframe').on('load', function() {
+    $('#pe-markdown-iframe').css('display', 'block');
+  });
   
+  $('#pe-markdown-container button').on('click', function() {
+    $('#pe-markdown-iframe').attr('src','/explorer/markdown/'+$('#pe-markdown-select').val());
+  });
+
+  $('html').on('click', function() {
+    if ( $('#pe-markdown-iframe').css('display') == 'block') {
+      $('#pe-markdown-iframe').css('display', 'none');
+    }
+  });
+  
+  // ###################################################################
+  // context menu
+  // ###################################################################
   $('.module').on('contextmenu', function(e) {
     clear_context();
     
