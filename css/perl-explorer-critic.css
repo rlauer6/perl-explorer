@@ -9,12 +9,6 @@
     cursor: pointer;
 }
 
-input.pe-button-enabled {
-    color: white;
-    font-weight: normal;
-    background: #555;
-}
-
 #pe-save-button {
     float: right;
     border: 1px solid #444;
@@ -28,15 +22,15 @@ input.pe-button-enabled {
     background: #036795;
 }
 
-input.pe-button-disabled {
+button.pe-button-disabled {
     background: #fff !important;;
     color: #aaa !important;
 }
 
-input.pe-button-enabled:hover {
-    background: #036795;
+button.pe-button-enabled {
     color: white;
-    font-weight: bold;
+    font-weight: normal;
+    background: #555;
 }
 
 i.pe-todo-icon {

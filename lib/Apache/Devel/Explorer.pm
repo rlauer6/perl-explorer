@@ -140,8 +140,13 @@ sub handler {
         return show_pod( $r, module => $1, explorer => $explorer );
     }
 
-    if ( $uri_path =~ /^source\/todos\/?$/xsm ) {
-        return api_todos( $r, explorer => $explorer );
+    if ( $uri_path =~ /^source\/todos\/?/xsm ) {
+        my $critic = $FALSE;
+        if ( $uri_path =~ /todos\/critic/xsm ) {
+            $critic = $TRUE;
+        }
+
+        return api_todos( $r, explorer => $explorer, critic => $critic );
     }
 
     if ( $uri_path =~ /^source\/(.+)$/xsm ) {
@@ -255,6 +260,7 @@ sub fetch_json_payload {
     return JSON->new->decode($body);
 }
 
+# critic means that we are adding TODOs based on a Perl::Critic finding
 ########################################################################
 sub api_todos {
 ########################################################################
@@ -1014,35 +1020,48 @@ Apache::Devel::Explorer
 =head1 SYNOPSIS
 
  <Location /explorer>
-    SetHandler perl-script
     PerlSetEnv CONFIG /app/perl-explorer.json
+    PerlSetEnv TT_INCLUDE_PATH /usr/local/share/perl-explorer/
+
+    SetHandler perl-script
+
     PerlResponseHandler Apache::Devel::Explorer
  </Location>
 
 =head1 DESCRIPTION
 
-A web application to help those maintaining legacy Perl applications. This app will allow you to:
+A web application to help those maintaining legacy Perl
+applications. This app will allow you to:
 
 =over 5
 
 =item * navigate a source tree of Perl modules
 
+=item * search the repository
+
 =item * view source code
 
 =item * execute Perl critic and view detail or summary results
 
+=item * add TODOs to the module based on L<Perl::Critic> findings or
+other issues
+
 =item * add POD templates to modules
+
+=item * view Perl documentation of local or CPAN modules
+
+=item * view markdown files in your source tree
 
 =item * tidy Perl code
 
 =back
-
-=head1 METHODS AND SUBROUTINES
 
 =head1 AUTHOR
 
 BIGFOOT - <bigfoot@cpan.org>
 
 =head1 SEE OTHER
+
+L<Perl::Critic>, L<Syntax::SourceHighlight>, L<Markdown::Render>
 
 =cut

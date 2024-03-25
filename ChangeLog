@@ -1,3 +1,18 @@
+Mon Mar 25 13:37:38 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[nits & bugs] :
+	* README.md: wip
+	* css/perl-explorer-critic.css
+	- input -> button
+	* templates/includes/perl-explorer-critic-summary.html.tt: likewise
+	* templates/perl-explorer-critic.html.tt: likewise
+	* js/perl-explorer-critic.js: disable save button on load
+	* lib/Apache/Devel/Explorer.pm
+	(handler): /source/todos/critic
+	* lib/Devel/Explorer/Critic.pm
+	(create_stat_summary): average_maccabe // 0
+	* lib/Devel/Explorer/ToDo.pm: whitespace
+
 Sat Mar 23 08:58:15 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[markdown]:

@@ -15,7 +15,7 @@ BEGIN {
 
 use Data::Dumper;
 use Devel::Explorer::Utils qw(:all);
-use English                qw(-no_match_vars);
+use English qw(-no_match_vars);
 use Perl::Critic;
 
 __PACKAGE__->follow_best_practice;
@@ -120,7 +120,7 @@ sub create_stat_summary {
         policies       => $stats->violations_by_policy(),
         total          => $stats->total_violations(),
         avg_complexity => sprintf '%5.2f',
-        $stats->average_sub_mccabe(),
+        $stats->average_sub_mccabe() // 0,
     };
 
     foreach ( 1 .. 5 ) {

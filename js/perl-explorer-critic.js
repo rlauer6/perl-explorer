@@ -14,7 +14,10 @@ $(document).ready(function () {
   if ( $('.pe-critic-todo').length > 0 ) {
     enable_save_button();
   }
-
+  else {
+    disable_save_button();
+  }
+  
   $('.pe-critic-policy').on('click', function() {
     var policy = $(this).text();
 
@@ -109,7 +112,7 @@ function disable_save_button() {
 function update_todo_status(line, add_or_delete)  {
 // #####################################################################
   var status = $('.pe-critic-todo').length; // how many do we have?
-
+  
   if ( add_or_delete ) {
     $(line).addClass('pe-critic-todo');
     $(line).find('i').addClass(['fa', 'fa-clipboard-list', 'fa-lg']);
@@ -167,10 +170,7 @@ function save_todos() {
     todos.push(linenum);
     todos.push(policy);
   });
-  
-  // TODO:
-  // - add spinner
-  
+   
   $.ajax({
     url: '/explorer/source/todos/critic',
     dataType: 'json',
@@ -189,6 +189,10 @@ function save_todos() {
     return true;
   }).fail(function($xhr, status, error) {
 
+    console.log($xhr);
+    console.log(status);
+    console.log(error);
+    
     display_error_message('Error saving your TODOs!');
     
     return false;

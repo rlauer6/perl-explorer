@@ -8,7 +8,7 @@
 
     [% INCLUDE "perl-explorer-status-message.html.tt" %]
     
-    <input id="pe-save-button" type="button" value="Save" />
+    <button class="pe-button" id="pe-save-button">Save</button>
 
     <div id="diagnostic" class="pe-theme-color">
       <h1></h1>

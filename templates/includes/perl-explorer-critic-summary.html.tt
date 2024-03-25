@@ -33,6 +33,6 @@
     </ul>
   </div>
   
-  <input class='pe-button pe-button-detail' type="button" value="Detail" />
-  <input class='pe-button pe-button-close' type="button" value="Ok" />
+  <button class='pe-button pe-button-detail'>Detail</button>
+  <button class='pe-button pe-button-close'>Ok</button>
 </div>

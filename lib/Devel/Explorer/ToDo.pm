@@ -15,9 +15,9 @@ BEGIN {
 
 use Data::Dumper;
 use Devel::Explorer::Utils qw(:all);
-use File::Temp             qw(tempfile);
-use English                qw(-no_match_vars);
-use List::Util             qw(pairs);
+use File::Temp qw(tempfile);
+use English qw(-no_match_vars);
+use List::Util qw(pairs);
 use Text::Wrap;
 use Readonly;
 
