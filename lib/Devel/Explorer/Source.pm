@@ -29,17 +29,18 @@ __PACKAGE__->mk_accessors(
       anchored
       css
       css_path
-      js
-      js_path
+      explorer
       file
       highlighter
       inputlang
+      js
+      js_path
       line_numbers
       module
       outputlang
-      use_template
-      template
       source
+      template
+      use_template
     )
 );
 
@@ -66,7 +67,11 @@ sub set_defaults {
     $self->set_js( fix_path( $js_path, $js ) );
 
     $self->set_outputlang( $self->get_outputlang // 'htmlcss.outlang' );
-    $self->set_inputlang( $self->get_inputlang   // 'perl.lang' );
+    $self->set_default_inputlang();
+
+    if ( $self->get_file ) {
+        $self->fetch_source;
+    }
 
     $self->set_line_numbers( $self->get_line_numbers // $TRUE );
 
@@ -80,7 +85,23 @@ sub set_defaults {
 
     $self->verify_template('source');
 
-    return;
+    return $self;
+}
+
+########################################################################
+sub set_default_inputlang {
+########################################################################
+    my ($self) = @_;
+
+    my $inputlang = $self->get_inputlang;
+
+    if ( !$inputlang && $self->get_file ) {
+        if ( $self->get_file =~ /([.][^.]+)$/xsm ) {
+            $inputlang = $SOURCE_HIGHLIGHT_MAP{$1};
+        }
+    }
+
+    return $self->set_inputlang( $inputlang // 'nohilite.lang' );
 }
 
 ########################################################################
@@ -114,23 +135,25 @@ sub highlight_source_lines {
 ########################################################################
 sub fetch_source {
 ########################################################################
-    my ( $self, @args ) = @_;
+    my ( $self, $file ) = @_;
 
-    my $options = ref $args[0] ? $args[0] : {@args};
+    $file //= $self->get_file;
 
-    my ( $source, $file ) = @{$options}{qw(source file)};
+    my $source;
 
-    $source = eval {
-        return $source
-          if $source;
+    if ( !$file ) {
+        $source = $self->get_source;
+    }
 
-        return $self->get_source
-          if $self->get_source;
+    return $source
+      if $source;
 
-        $file //= $self->get_file;
+    die "no file\n"
+      if !$file;
 
-        $source = slurp_file $file;
-    };
+    $source = slurp_file $file;
+
+    $self->set_source($source);
 
     return wantarray ? split /\n/xsm, $source : $source;
 }
@@ -142,12 +165,12 @@ sub highlight {
 
     my $options = ref $args[0] ? $args[0] : {@args};
 
-    my ( $use_template, $module, $dependencies ) = @{$options}{qw(use_template module dependencies)};
+    my ( $use_template, $module, $filename, $dependencies ) = @{$options}{qw(use_template module filename dependencies)};
 
     my $highlighter = $self->get_highlighter;
     $use_template //= $self->get_use_template;
 
-    my $source = $self->fetch_source($options);
+    my $source = $self->fetch_source;
 
     die 'no source'
       if $EVAL_ERROR || !$source;
@@ -169,7 +192,9 @@ sub highlight {
     return $highlighted_source
       if !$use_template || !$template;
 
-    my $params = {
+    $filename //= $self->get_filename // $EMPTY,
+
+      my $params = {
         dependencies => $dependencies,
         lines        => scalar( split /\n/xsm, $source ),
         source       => $highlighted_source,
@@ -178,8 +203,10 @@ sub highlight {
         todos        => $options->{todos},
         subs         => find_subs($source),
         linenum      => $options->{linenum} // 1,
-        module       => $module // $options->{file} // $self->get_file // $EMPTY,
-    };
+        title        => $module             // $filename,
+        module       => $module,
+        repo         => $self->get_explorer->get_repo,
+      };
 
     my $output = tt_process( $template, $params );
 
@@ -212,25 +239,23 @@ sub find_subs {
 ########################################################################
 sub create_reverse_dependency_listing {
 ########################################################################
-    my ( $self, @args ) = @_;
+    my ($self) = @_;
 
-    my $options = get_args(@args);
+    my $module    = $self->get_module;
+    my $explorer  = $self->get_explorer;
+    my $file_info = $explorer->get_file_info;
 
-    my ( $explorer, $module ) = @{$options}{qw(explorer module)};
-
-    my %package_names = reverse %{ $explorer->get_package_names };
-
-    my $search = Devel::Explorer::Search->new();
+    my $search   = Devel::Explorer::Search->new( explorer => $explorer );
+    my $file_map = $explorer->get_file_map;
 
     my $found = $search->search_all(
         regexp   => qr/[^:]$module[^:]/xsm,
-        modules  => $explorer->get_modules,
         callback => sub {
             my ( $file, $results ) = @_;
 
-            my $package_name = $package_names{$file};
+            my $id = $file_map->{$file};
 
-            $results->{$file} = [ $results->{$file}, $package_name ];
+            $results->{$file} = [ $results->{$file}, @{ $file_info->{$id}->{package_name} } ];
 
             return;
         }
@@ -251,39 +276,31 @@ sub create_reverse_dependency_listing {
 ########################################################################
 sub create_dependency_listing {
 ########################################################################
-    my ( $self, @args ) = @_;
+    my ( $self, $id ) = @_;
 
-    my $options = get_args(@args);
+    my $explorer = $self->get_explorer;
 
-    my ( $explorer, $file, $source, $module ) = @{$options}{qw( explorer file source module)};
+    my $file_info = $explorer->get_file_info->{$id};
 
-    my %package_names = %{ $explorer->get_package_names };
-
-    if ( !$source ) {
-        $file //= $package_names{$module};
-
-        die "no source\n"
-          if !$file || !-e $file;
-
-        $source = slurp_file $file;
-    }
+    my $source = $self->fetch_source;
 
     my $dependencies = find_requires($source);
 
     my $has_pod  = {};
     my $is_local = {};
 
-    my @package_names = keys %{ $explorer->get_package_names };
+    my @package_names = keys %{ $explorer->get_modules };
 
     foreach my $m ( @{$dependencies} ) {
         $has_pod->{$m}  = $explorer->has_pod($m);
         $is_local->{$m} = ( any { $m eq $_ } @package_names ) ? $TRUE : $FALSE;
     }
 
-    my $reverse_dependency_listing = $self->create_reverse_dependency_listing(
-        module   => $module,
-        explorer => $explorer
-    );
+    my $reverse_dependency_listing;
+
+    if ( $file_info->{ext} eq '.pm' ) {
+        $reverse_dependency_listing = $self->create_reverse_dependency_listing();
+    }
 
     return {
         reverse_dependencies => $reverse_dependency_listing,

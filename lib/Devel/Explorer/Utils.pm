@@ -8,7 +8,10 @@ use File::Temp qw(tempfile);
 use File::Copy;
 
 use English qw(-no_match_vars);
+use File::Find;
+use File::Basename qw(fileparse);
 use JSON;
+use List::Util qw(sum any);
 use Template;
 use Text::Wrap;
 use Scalar::Util qw(reftype);
@@ -20,19 +23,41 @@ Readonly::Scalar our $DOUBLE_COLON => q{::};
 Readonly::Scalar our $EMPTY        => q{};
 Readonly::Scalar our $COMMA        => q{,};
 Readonly::Scalar our $PERIOD       => q{.};
-Readonly::Scalar our $SPACE       => q{ };
+Readonly::Scalar our $SPACE        => q{ };
 
 Readonly::Scalar our $TRUE  => 1;
 Readonly::Scalar our $FALSE => 0;
 
 Readonly::Scalar our $DEFAULT_INCLUDE_PATH => '/usr/loca/share/perl-explorer';
-  
+
+Readonly::Hash our %SOURCE_HIGHLIGHT_MAP => (
+    '.xml'      => 'xml.lang',
+    '.am'       => 'makefile.lang',
+    '.sh'       => 'sh.lang',
+    'ChangeLog' => 'changelog.lang',
+    '.conf'     => 'conf.lang',
+    '.pl'       => 'perl.lang',
+    '.pm'       => 'perl.lang',
+    '.php3'     => 'php.lang',
+    '.php4'     => 'php.lang',
+    '.php5'     => 'php.lang',
+    '.py'       => 'py.lang',
+    '.html'     => 'html.lang',
+    '.roc'      => 'html.lang',
+    '.css'      => 'css.lang',
+    '.js'       => 'js.lang',
+    '.log'      => 'log.lang',
+    '.m4'       => 'm4.lang',
+    '.spec'     => 'spec.lang',
+);
+
 our %EXPORT_TAGS = (
     funcs => [
         qw(
           add_pod
           get_args
           create_backup
+          fetch_ignore_list
           fetch_source_from_module
           find_requires
           fix_path
@@ -61,7 +86,11 @@ our %EXPORT_TAGS = (
           $SPACE
         )
     ],
-
+    maps => [
+        qw(
+          %SOURCE_HIGHLIGHT_MAP
+        )
+    ],
 );
 
 $EXPORT_TAGS{all} = [ map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS ];
@@ -91,10 +120,10 @@ sub is_array {
 ########################################################################
 sub to_html {
 ########################################################################
-    my ($str, $options ) = @_;
+    my ( $str, $options ) = @_;
 
-    $str =~s/\n/<br\/>/xsmg;
-    
+    $str =~ s/\n/<br\/>/xsmg;
+
     return $str;
 }
 
@@ -146,8 +175,8 @@ sub tt_process {
 
     my $include_path = $ENV{TT_INCLUDE_PATH} // $DEFAULT_INCLUDE_PATH;
     $include_path = [ split /:/xsm, $include_path ];
-    
-    my $tt = Template->new( { INTERPOLATE => 1, INCLUDE_PATH => $include_path });
+
+    my $tt = Template->new( { INTERPOLATE => 1, INCLUDE_PATH => $include_path } );
 
     my $output = q{};
 
@@ -155,6 +184,21 @@ sub tt_process {
       or die $tt->error();
 
     return $output;
+}
+
+########################################################################
+sub fetch_ignore_list {
+########################################################################
+    my ( $path, $list ) = @_;
+
+    if ( $list && !ref $list && -e "$path/$list" ) {
+        $list = eval { return [ split /\n/xsm, slurp_file "$path/$list" ]; };
+    }
+    elsif ( !ref $list ) {
+        $list = [$list];
+    }
+
+    return @{ $list || [] };
 }
 
 ########################################################################
@@ -169,15 +213,7 @@ sub fetch_source_from_module {
     die "usage: fetch_source_from_module(explorer => explorer, module => module)\n"
       if !$explorer || !$module;
 
-    my $file = $explorer->get_module_path($module);
-
-    if ( !$file ) {
-        my $package_names = $explorer->get_package_names;
-        $file = $package_names->{$module};
-    }
-    
-    die "no file found\n"
-      if !$file;
+    my $file = $explorer->get_file_by_module($module);
 
     return slurp_file($file);
 }
@@ -231,7 +267,6 @@ sub replace_file {
 
         $unlink //= $TRUE;
     }
-
 
     if ( !copy( $outfile, $infile ) ) {
         rename $backup, $infile;
@@ -315,7 +350,6 @@ sub create_pod {
 
     my $see_also_pod = wrap( $EMPTY, $EMPTY, join "$COMMA ", map { sprintf 'L<%s>', $_ } @{$see_also} );
 
-    
     my $params = {
         module   => $module // 'No::Name',
         subs     => [ sort @subs ],

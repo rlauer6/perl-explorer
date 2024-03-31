@@ -12,7 +12,12 @@
       "perl-explorer-markdown.js"
       ]
   },
-  "repo" : "[% repo %]",
+  "ignore" : ".gitignore",
+  "repo" : {
+    "[% repo %]" : {
+      "root" : "[% repo_path %]",
+      "ignore" : []
+    },
   "datadir" : "[% datadir %]",
   "perl5libdir" : "[% perl5libdir %]",
   "sitedir" : "[% sitedir %]",

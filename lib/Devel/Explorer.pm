@@ -18,12 +18,16 @@ use Cwd;
 use Data::Dumper;
 use Devel::Explorer::Markdown;
 use Devel::Explorer::Utils qw(:all);
-use English                qw(-no_match_vars);
+use Digest::MD5 qw(md5_hex);
+use English qw(-no_match_vars);
 use File::Find;
-use HTML::Tidy;
+use File::Basename qw(fileparse);
+use HTML::Tidy5;
 use JSON;
-use List::Util qw(pairs);
+use List::Util qw(pairs any sum none);
 use Template;
+use Text::Gitignore qw(match_gitignore);
+use Scalar::Util qw(reftype);
 
 use parent qw(Class::Accessor::Fast);
 
@@ -33,10 +37,15 @@ __PACKAGE__->mk_accessors(
       branches
       config
       config_file
+      file_info
+      file_map
+      ignore_list
+      allow_list
+      markdown
       modules
       package_names
       path
-      pod_status
+      repo
       tree
     )
 );
@@ -52,54 +61,101 @@ sub new {
 
     my $self = $class->SUPER::new($options);
 
-    my @modules;
-
-    my $config = $self->init_config;
-
-    my $path = $self->get_path // $config->{path};
-
-    if ($path) {
-        croak "invalid path to Perl modules ($path)\n"
-          if !-d $path;
-
-        find(
-            sub {
-                return if !/[.]pm$/xsm;
-                push @modules, $File::Find::name;
-            },
-            $path
-        );
-
-        my %paths;
-
-        foreach my $module (@modules) {
-            my $module_path = $module;
-
-            $module =~ s/$path\///xsm;
-            $module =~ s/\//$DOUBLE_COLON/xsmg;
-            $module =~ s/[.]pm$//xsm;
-            $paths{$module_path} = $module;
-        }
-
-        $self->set_modules( \%paths );
-
-        $self->create_tree();
-        $self->update_pod_status();
-    }
+    $self->init();
 
     return $self;
 }
 
 ########################################################################
-sub get_module_path {
+sub init {
+########################################################################
+    my ($self) = @_;
+
+    my @modules;
+
+    my $config = $self->fetch_config;
+
+    my $repo = $self->get_repo;
+
+    $self->set_file_info( {} );
+    $self->set_modules( {} );
+
+    return
+      if !$repo;
+
+    my $repo_list = $config->{repo};
+
+    my $path = $self->get_path // sprintf '/perl-explorer/%s', $repo;
+
+    die "invalid path ($path)\n"
+      if !-d $path;
+
+    # setup allow, ignore lists
+    for my $list (qw(ignore allow)) {
+        my @list = fetch_ignore_list( $path, $config->{$list} );
+        push @list, fetch_ignore_list( $path, $config->{repo}->{$repo}->{$list} );
+
+        my $method = "set_${list}_list";
+        $self->$method( \@list );
+    }
+
+    my $file_info = $self->fetch_file_list( path => $path );
+
+    $self->set_file_info($file_info);
+
+    # create a map of Perl modules => file ids
+    my %modules;
+    my %file_map;
+
+    foreach my $id ( keys %{$file_info} ) {
+        my $file = $file_info->{$id};
+
+        # lookup id by filename
+        $file_map{ $file->{vpath} } = $id;
+
+        if ( $file->{package_name} ) {
+            foreach ( @{ $file->{package_name} } ) {
+                $modules{$_} = $id;
+            }
+        }
+    }
+
+    $self->set_modules( \%modules );
+    $self->set_file_map( \%file_map );
+
+    my ( $tree, $branches ) = $self->create_tree();
+
+    $self->set_tree($tree);
+    $self->set_branches($branches);
+
+    return $self;
+}
+
+########################################################################
+sub get_file_by_id {
+########################################################################
+    my ( $self, $id ) = @_;
+
+    my $file_info = $self->get_file_info;
+
+    return
+      if !$file_info || !ref $file_info;
+
+    my $id_list = ref $id ? $id : [$id];
+
+    my @file_list = map { $file_info->{$_}->{vpath} } @{$id_list};
+
+    @file_list = grep { -e $_ } @file_list;
+
+    return wantarray ? @file_list : $file_list[0];
+}
+
+########################################################################
+sub get_file_by_module {
 ########################################################################
     my ( $self, $module ) = @_;
 
-    my %modules = reverse %{ $self->get_modules // {} };
-
-    my $file = $modules{$module};
-
-    return $file && -e $file ? $file : $EMPTY;
+    return $self->get_file_by_id( $self->get_modules->{$module} );
 }
 
 ########################################################################
@@ -107,47 +163,13 @@ sub has_pod {
 ########################################################################
     my ( $self, $module ) = @_;
 
-    return $self->get_pod_status->{$module};
+    my $id = $self->get_modules->{$module};
+
+    return $self->get_file_info->{$id}->{has_pod};
 }
 
 ########################################################################
-sub update_pod_status {
-########################################################################
-    my ($self) = @_;
-
-    my $modules = $self->get_modules;
-    my @paths   = keys %{ $self->get_modules };
-
-    my %pod_status;
-    my %package_names;
-
-    foreach my $file (@paths) {
-        my $text = eval { return slurp_file($file); };
-        my $package_name;
-
-        if ( $text =~ /^package\s+([^;]+);/xsm ) {
-            $package_name = $1;
-
-            $package_names{$package_name} = $file;
-        }
-
-        if ( $text && $text =~ /^[=]pod\s*$/xsm ) {
-            $pod_status{ $modules->{$file} } = length $text;
-        }
-        else {
-            $pod_status{ $modules->{$file} } = 0;
-        }
-
-        $pod_status{$package_name} = $pod_status{ $modules->{$file} };
-    }
-
-    $self->set_package_names( \%package_names );
-
-    return $self->set_pod_status( \%pod_status );
-}
-
-########################################################################
-sub init_config {
+sub fetch_config {
 ########################################################################
     my ($self) = @_;
 
@@ -207,41 +229,19 @@ sub resolve_dir {
 }
 
 ########################################################################
-sub expand_branch {
-########################################################################
-    my ( $self, $branch ) = @_;
-
-    my $tree = $self->get_tree;
-
-    my $branches = $self->get_branches;
-
-    my @parts = split /$DOUBLE_COLON/xsm, $branch;
-
-    my @leaves = @{ $branches->{$branch} };
-
-    foreach (@parts) {
-        $tree = $tree->{$_};
-    }
-
-    $branches = [ map { $branch . $DOUBLE_COLON . $_ } keys %{$tree} ];
-
-    return { leaves => \@leaves, branches => $branches };
-}
-
-########################################################################
 sub traverse_tree {
 ########################################################################
-    my ( $self, $branch, $tree, $leaves ) = @_;
+    my ( $branch, $tree, $leaves ) = @_;
 
     $leaves //= [];
 
     foreach my $twig ( keys %{$branch} ) {
-        my $next_branch = join $DOUBLE_COLON, @{$tree}, $twig;
+        my $next_branch = join q{/}, @{$tree}, $twig;
         push @{$leaves}, $next_branch;
 
         next if !ref $branch->{$twig};
 
-        $self->traverse_tree( $branch->{$twig}, [ @{$tree}, $twig ], $leaves );
+        traverse_tree( $branch->{$twig}, [ @{$tree}, $twig ], $leaves );
     }
 
     return @{$leaves};
@@ -252,38 +252,36 @@ sub create_tree {
 ########################################################################
     my ($self) = @_;
 
-    my @modules = values %{ $self->get_modules };
+    my $file_info = $self->get_file_info;
+
+    my @files = map { $file_info->{$_}->{vpath} } keys %{$file_info};
 
     my $tree = {};
 
-    foreach my $module (@modules) {
+    foreach my $file (@files) {
 
-        my @parts = split /$DOUBLE_COLON/xsm, $module;
+        my @parts = split /\//xsm, $file;
         pop @parts;
 
         my $leaf = $tree;
 
         foreach my $p (@parts) {
+            next if !$p;
             $leaf->{$p} //= {};
             $leaf = $leaf->{$p};
         }
-
     }
 
-    my %leaves = map { $_ => [] } $self->traverse_tree( $tree, [] );
+    my %leaves = map { $_ => [] } traverse_tree( $tree, [] );
 
-    foreach my $module (@modules) {
-        my @parts = split /$DOUBLE_COLON/xsm, $module;
+    foreach my $file (@files) {
+        my @parts = split /\//xsm, $file;
         pop @parts;
 
-        my $leaf = join $DOUBLE_COLON, @parts;
+        my $leaf = join q{/}, @parts;
 
-        push @{ $leaves{$leaf} }, $module;
+        push @{ $leaves{$leaf} }, $file;
     }
-
-    $self->set_tree($tree);
-
-    $self->set_branches( \%leaves );
 
     return ( $tree, \%leaves );
 }
@@ -297,17 +295,9 @@ sub show_branch {
 
     $parents //= [];
 
-    my $this_branch = join $DOUBLE_COLON, @{$parents}, $branch_name;
+    my $this_branch = q{/} . join q{/}, @{$parents}, $branch_name;
 
     my $id = $options->{class};
-
-    my $class = 'branch_' . $id;
-
-    #         <span style="display:inline-block; text-align:center;">
-    #         <img class="folder" src="/icons/folder.png" style="display:inline-block; padding-right:10px;">
-    #         <img class="folder" src="/icons/folder.open.png" style="display:none; padding-right:10px;">
-    #         %s
-    #       </span>
 
     my $folders = <<"END_OF_HTML";
      <h3 class="dir" id="%s">
@@ -317,34 +307,49 @@ sub show_branch {
      </h3>
 END_OF_HTML
 
-    my $h3 = sprintf $folders, $id, $this_branch;
+    my $root = $options->{root};
+
+    my $display_branch = $this_branch;
+
+    $display_branch =~ s/$root\/?//xsm;
+
+    my $h3 = sprintf $folders, $id, $display_branch;
 
     $options->{html} .= $h3;
 
-    my @modules    = @{ $branches->{$this_branch} || [] };
-    my %pod_status = %{ $options->{pod_status} };
+    my @files = @{ $branches->{$this_branch} || [] };
 
-    if (@modules) {
+    my $file_map = $options->{file_map};
+
+    if (@files) {
 
         my @li;
 
-        foreach ( sort @modules ) {
-            my $class = sprintf 'class="module%s"', $pod_status{$_} ? ' pod' : '';
-            push @li, sprintf '<li %s>%s</li>', $class, $_;
+        foreach ( sort @files ) {
+            my $id = $file_map->{$_};
+
+            my $display_name = $_;
+            $display_name =~ s/$root\/?//xsm;
+
+            my $class = 'pe-source-file';
+
+            if ( $display_name =~ /[.]pm$/xsm ) {
+                $class = $class . ' pe-module';
+            }
+
+            push @li, sprintf '<li id="%s" class="%s">%s</li>', $id, $class, $display_name;
         }
 
-        $options->{html} .= sprintf qq{\n<div class="branch $class">\n<ul>\n%s\n</ul>\n</div>\n}, join "\n", @li;
+        $options->{html} .= sprintf qq{\n<div class="branch branch_$id">\n<ul>\n%s\n</ul>\n</div>\n}, join "\n", @li;
     }
 
-    return { $this_branch => [@modules] };
+    return { $this_branch => [@files] };
 }
 
 ########################################################################
 sub walk_tree {
 ########################################################################
     my ( $tree, $node, $parents, $callback, $options ) = @_;
-
-    # $options->{html} .= qq{\n<div class="branch">\n};
 
     my $class = $options->{class} // 0;
     $class++;
@@ -381,18 +386,28 @@ sub walk_tree {
 ########################################################################
 sub directory_index_body {
 ########################################################################
-    my ( $self, $root ) = @_;
+    my ( $self, $root, $tree, $branches ) = @_;
 
     my $options = {
-        branches   => $self->get_branches,
-        html       => $EMPTY,
-        pod_status => $self->get_pod_status
+        branches => $branches,
+        html     => q{},
+        root     => $root,
+        file_map => $self->get_file_map,
     };
 
+    my (@path) = split /\//xsm, $root;
+
+    my $node = pop @path;
+
+    my @parents = grep {/./xsm} @path;
+
+    while (@path) {
+        $tree = $tree->{ shift @path };
+    }
+
     walk_tree(
-        $self->get_tree,
-        $root,
-        [],
+        $tree, $node,
+        [@parents],
         sub {
             my ( $tree, $branch, $parents, $options ) = @_;
 
@@ -441,12 +456,19 @@ sub directory_index {
     die "no index template found!\n"
       if !$template;
 
-    my $body = $self->directory_index_body($root);
+    my $body = $self->directory_index_body( $root, $self->get_tree, $self->get_branches );
 
-    my $markdown = Devel::Explorer::Markdown->new( config => $config );
+    my $file_info = $self->get_file_info;
+
+    my @markdown = grep { $file_info->{$_}->{ext} && $file_info->{$_}->{ext} eq '.md' } keys %{$file_info};
+
+    my %markdown_files = reverse map { $_->{path} => md5_hex( $_->{path} ) } @{$file_info}{@markdown};
+
+    my $markdown = Devel::Explorer::Markdown->new( config => $config, markdown_files => \%markdown_files );
 
     my $params = {
-        markdown_files => $markdown->get_markdown_files,
+        repo           => $self->get_repo,
+        markdown_files => \%markdown_files,
         site           => $config->{site},
         module_listing => $body,
         logo           => $config->{site}->{logo} ? $config->{site}->{logo} : $EMPTY,
@@ -456,15 +478,140 @@ sub directory_index {
 
     my $output = tt_process( $template, $params );
 
-    return $output;
-
-    return HTML::Tidy->new(
-        {   'indent-spaces' => 2,
-            wrap            => 120,
-            indent          => 1,
-            'output-html'   => 0,
+    my $tidy = HTML::Tidy5->new(
+        {   indent_spaces         => 2,
+            wrap                  => 120,
+            indent                => $TRUE,
+            output_xhtml          => $TRUE,
+            'drop-empty-elements' => $FALSE,
         }
-    )->clean($output);
+    );
+
+    my $tidy_html = $tidy->clean($output);
+
+    return $tidy_html;
+}
+
+########################################################################
+sub fetch_file_list {
+########################################################################
+    my ( $self, @args ) = @_;
+
+    my $options = get_args(@args);
+
+    my $config = $self->get_config;
+    my $repo   = $self->get_repo;
+
+    my ( $path, $ignore_list, $allow_list ) = @{$options}{qw(path ignore allow)};
+
+    if ( !$ignore_list ) {
+        $ignore_list = $self->get_ignore_list || [];
+    }
+
+    if ( !$allow_list ) {
+        $allow_list = $self->get_allow_list || [];
+    }
+
+    $path //= '/perl-explorer/' . $repo;
+
+    my @file_list;
+
+    find(
+        {   preprocess => sub {
+                my @list = @_;
+
+                my %file_map = map { "$File::Find::dir/" . $_ => $_ } @list;
+
+                my @ignore_these = match_gitignore( $ignore_list, keys %file_map );
+                my @allow_these  = match_gitignore( $allow_list,  keys %file_map );
+
+                @ignore_these = map { $file_map{$_} } @ignore_these;
+                @allow_these  = map { $file_map{$_} } @allow_these;
+
+                if ( $File::Find::dir =~ /autotools/xsm ) {
+                    dbg
+                      list         => \@list,
+                      ignore_these => \@ignore_these,
+                      allow_these  => \@allow_these;
+                }
+
+                my @ok_files;
+
+                foreach my $f (@list) {
+                    next if ( any { $f eq $_ } @ignore_these ) && none { $f eq $_ } @allow_these;
+                    push @ok_files, $f;
+                }
+
+                return @ok_files;
+            },
+            wanted => sub {
+                push @file_list, $File::Find::name;
+            }
+        },
+        $path
+    );
+
+    my %file_info;
+
+    my $root = $config->{repo}->{$repo}->{root};
+
+    foreach my $file (@file_list) {
+        next if -d $file;
+
+        my ( $name, undef, $ext ) = fileparse( $file, qr/[.][^.]+$/xsm );
+        my $real_path = $file;
+        $real_path =~ s/$path/$root/xsm;
+
+        my $filename = "$name$ext";
+
+        my (@source) = eval { slurp_file $file; };
+
+        warn "could not read $file: $EVAL_ERROR\n"
+          if !@source || $EVAL_ERROR;
+
+        next
+          if !@source || $EVAL_ERROR;
+
+        my $id = md5_hex($real_path);
+
+        $file_info{$id} = {
+            path    => $real_path,
+            vpath   => $file,
+            name    => $name,
+            id      => $id,
+            ext     => $ext,
+            size    => ( -s $file ),
+            lines   => scalar(@source),
+            has_pod => $FALSE,
+            todos   => sum map { /[#][#]\sTODO/xsm ? 1 : 0 } @source,
+        };
+
+        next
+          if $file !~ /[.]p[lm]$/xsm;
+
+        $file_info{$id}->{has_pod} = ( any { $_ =~ /^=pod/xsm } @source ) ? $TRUE : $FALSE;
+
+        for (@source) {
+            next
+              if !/^package\s([^;]+);\s*$/xsm;
+
+            # could be multiple packages in file
+            if ( $file_info{$id}->{package_name} ) {
+                my $package_names = $file_info{$id}->{package_name};
+
+                if ( !ref $package_names ) {
+                    $package_names = [$package_names];
+                }
+
+                push @{$package_names}, $1;
+            }
+            else {
+                $file_info{$id}->{package_name} = [$1];
+            }
+        }
+    }
+
+    return \%file_info;
 }
 
 ########################################################################

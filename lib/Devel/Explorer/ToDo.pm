@@ -175,7 +175,7 @@ sub save_todos {
         }
     }
 
-    my $file = $explorer->get_module_path($module);
+    my $file = $explorer->get_file_by_module($module);
 
     return $FALSE
       if !$commented_source;

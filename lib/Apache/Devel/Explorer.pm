@@ -79,6 +79,9 @@ sub find_module {
 
     my $module = eval {
         foreach my $path ( @extra_paths, @INC ) {
+            dbg
+              path   => $path,
+              module => $module_name;
 
             return "$path/$module_name"
               if -e "$path/$module_name";
@@ -86,6 +89,24 @@ sub find_module {
     };
 
     return $module;
+}
+########################################################################
+sub parse_uri {
+########################################################################
+    my ($uri) = @_;
+
+    my $uri_path = $EMPTY;
+    my $repo     = $EMPTY;
+
+    if ( $uri =~ /\/explorer\/pod\/(.*)?/xsm ) {
+        $uri_path = $uri;
+    }
+    elsif ( $uri =~ /\/explorer\/([^\/]+)\/?(.*)$/xsm ) {
+        $repo     = $1;
+        $uri_path = $2;
+    }
+
+    return ( $uri_path, $repo );
 }
 
 # +------------------------------+
@@ -97,13 +118,19 @@ sub handler {
 ########################################################################
     my ($r) = @_;
 
-    my $explorer = eval { return init_explorer($r); };
+    my $uri = $r->uri;
+
+    my ( $uri_path, $repo ) = parse_uri($uri);
+
+    dbg
+      uri_path => $uri_path,
+      repo     => $repo;
+
+    my $explorer = eval { return init_explorer( $r, repo => $repo ); };
 
     my $err = $EVAL_ERROR;
 
     if ( !$explorer || $err ) {
-        my $config_path = $ENV{CONFIG} // q{};
-
         return html_error(
             $r,
             msg     => 'could not initialize Perl explorer',
@@ -111,37 +138,35 @@ sub handler {
         );
     }
 
-    my $uri = $r->uri;
-
-    if ( $uri =~ /\/explorer\/?$/xsm ) {
+    if ( !$uri_path ) {
         return explorer( $r, explorer => $explorer );
     }
 
-    my $uri_path;
-
-    if ( $uri =~ /\/explorer\/(.+)$/xsm ) {
-        $uri_path = $1;
+    if ( $uri_path =~ /markdown\/([[:digit:]a-f]{32})$/xsm ) {
+        return show_markdown( $r, explorer => $explorer, markdown_id => $1 );
     }
 
-    $uri_path //= q{};
+    if ( $uri_path =~ /^source\//xsm ) {
+        my @uri_parts = split /\//xsm, $uri_path;
 
-    return show_index( $r, $uri )
-      if $uri_path =~ /^index/xsm;
-
-    if ( $uri_path =~ /markdown(\/?[\da-f]+)?$/xsm ) {
-        return show_markdown( $r, explorer => $explorer, markdown_id => $1 );
+        my $dispatch = {
+            search => \&api_search,
+            pod    => \&show_pod,
+            todos  => \&api_todos,
+        };
     }
 
     if ( $uri_path =~ /source\/search/xsm ) {
         return api_search( $r, explorer => $explorer );
     }
 
-    if ( $uri_path =~ /^pod\/(.+)$/xsm ) {
+    if ( $uri_path =~ /pod\/(.+)$/xsm ) {
         return show_pod( $r, module => $1, explorer => $explorer );
     }
 
-    if ( $uri_path =~ /^source\/todos\/?/xsm ) {
+    if ( $uri_path =~ /source\/todos\/?/xsm ) {
         my $critic = $FALSE;
+
         if ( $uri_path =~ /todos\/critic/xsm ) {
             $critic = $TRUE;
         }
@@ -149,8 +174,17 @@ sub handler {
         return api_todos( $r, explorer => $explorer, critic => $critic );
     }
 
-    if ( $uri_path =~ /^source\/(.+)$/xsm ) {
-        return show_source( $r, module => $1, explorer => $explorer );
+    if ( $uri_path =~ /source\/(.+)$/xsm ) {
+        my $id = $1;
+
+        if ( $id !~ /^[[:digit:]a-f]{32}$/xsm ) {
+            $id = $explorer->get_modules->{$id};
+
+            return $NOT_FOUND
+              if !$id;
+        }
+
+        return show_source( $r, id => $id, explorer => $explorer );
     }
 
     if ( $uri_path =~ /^source-lines\/(.+)$/xsm ) {
@@ -178,39 +212,15 @@ sub show_markdown {
 
     my ( $explorer, $markdown_id ) = @{$options}{qw(explorer markdown_id)};
 
-    my $md = Devel::Explorer::Markdown->new( config => $explorer->get_config );
+    my $file = $explorer->get_file_by_id($markdown_id);
 
-    my %markdown_files = %{ $md->get_markdown_files() };
+    dbg
+      file => $file,
+      id   => $markdown_id;
 
-    $markdown_id =~ s/^\///xsm;
+    my $md = Devel::Explorer::Markdown->new( file => $file, config => $explorer->get_config );
 
-    # no id, so look for a README.md in root of markdown path
-    # if we don't find one, then well take the first
-
-    if ( !$markdown_id ) {
-        my $real_path = $explorer->get_config->{markdown}->{path};
-
-        my @readmes = grep {/README[.]md/xsm} values %markdown_files;
-
-        %markdown_files = reverse %markdown_files;
-
-        my $id;
-
-        foreach my $r (@readmes) {
-            $id = $markdown_files{$r};
-
-            $r =~ s/$real_path\///xsm;
-
-            last
-              if $r eq 'README.md';
-        }
-
-        $markdown_id = $id;
-    }
-
-    $markdown_id ||= ( values %markdown_files )[0];
-
-    my $html = $md->render_markdown($markdown_id);
+    my $html = $md->render_markdown();
 
     output_html( $r, $html );
 
@@ -402,8 +412,9 @@ sub api_source_lines {
     }
 
     my $source_explorer = Devel::Explorer::Source->new(
-        config => $explorer->get_config,
-        source => $source,
+        config   => $explorer->get_config,
+        source   => $source,
+        explorer => $explorer,
     );
 
     my $highlighted_source = $source_explorer->highlight_source_lines();
@@ -535,9 +546,27 @@ sub explorer {
 
     my ($explorer) = @{$options}{qw(explorer)};
 
-    $explorer->set_tree( { $ROOT_NODE => $explorer->get_tree } );
+    my $index;
 
-    my $index = $explorer->directory_index($ROOT_NODE);  # $ROOT_NODE);
+    if ( $explorer->get_repo ) {
+        $explorer->set_tree( { $ROOT_NODE => $explorer->get_tree } );
+        my $root = '/perl-explorer/' . $explorer->get_repo;
+
+        $index = $explorer->directory_index($root);
+    }
+    else {
+        my $config        = $explorer->get_config;
+        my $repo_template = slurp_file $config->{templates}->{repo_index};
+
+        $index = tt_process(
+            $repo_template,
+            {   repo_listing => $config->{repo},
+                js           => fix_path( $config->{site}->{js},  $config->{repo_index}->{js} ),
+                css          => fix_path( $config->{site}->{css}, $config->{repo_index}->{css} ),
+                logo         => $config->{site}->{logo},
+            }
+        );
+    }
 
     output_html( $r, $index );
 
@@ -608,9 +637,13 @@ END_OF_HTML
 ########################################################################
 sub init_explorer {
 ########################################################################
-    my ($r) = @_;
+    my ( $r, @args ) = @_;
 
-    my $config_file = $ENV{CONFIG};
+    my $options = get_args(@args);
+
+    my ( $config_file, $repo ) = @{$options}{qw(config_file repo)};
+
+    $config_file //= $ENV{CONFIG};
 
     die "no config file\n"
       if !$config_file;
@@ -618,7 +651,7 @@ sub init_explorer {
     die "could not find '$config_file'\n"
       if !-e $config_file;
 
-    my $explorer = Devel::Explorer->new( config_file => $config_file );
+    my $explorer = Devel::Explorer->new( config_file => $config_file, repo => $repo );
 
     return $explorer;
 }
@@ -757,16 +790,14 @@ sub show_source {
 
     my $options = get_args(@args);
 
-    my ( $module, $explorer ) = @{$options}{qw(module explorer)};
+    my ( $id, $explorer ) = @{$options}{qw(id explorer)};
 
-    my $config = $explorer->get_config;
+    my $file_info = $explorer->get_file_info->{$id};
 
-    my $source = eval { fetch_source_from_module( explorer => $explorer, module => $module ); };
-
-    if ( !$source || $EVAL_ERROR ) {
+    if ( !$file_info ) {
         html_error(
             $r,
-            msg      => "$module not found",
+            msg      => "$id not found",
             explorer => $explorer,
             status   => $NOT_FOUND
         );
@@ -774,18 +805,42 @@ sub show_source {
         return $OK;
     }
 
+    my $config = $explorer->get_config;
+
+    my ($module) = eval {
+        my $package_names = $file_info->{package_name};
+
+        return
+          if !$package_names;
+
+        return $package_names->[0]
+          if @{$package_names} == 1;
+
+        my $filename = $file_info->{name};
+
+        return grep {/${filename}$/xsm} @{$package_names};
+    };
+
+    my $filename = join $EMPTY, @{$file_info}{qw(name ext)};
+
+    my $inputlang = $SOURCE_HIGHLIGHT_MAP{ $file_info->{ext} } // 'nohilite.lang';
+
     my $source_explorer = Devel::Explorer::Source->new(
-        source       => $source,
+        explorer     => $explorer,
         config       => $config,
         module       => $module,
+        file         => $file_info->{vpath},
+        inputlang    => $inputlang,
         use_template => $TRUE,
     );
 
-    my $dependencies = $source_explorer->create_dependency_listing(
-        module   => $module,
-        source   => $source,
-        explorer => $explorer
-    );
+    my $source = $source_explorer->get_source;
+
+    my $dependencies;
+
+    if ( $module || $file_info->{ext} eq '.pl' ) {
+        $dependencies = $source_explorer->create_dependency_listing($id);
+    }
 
     my $todos = 0;
 
@@ -800,6 +855,7 @@ sub show_source {
         $r,
         $source_explorer->highlight(
             module       => $module,
+            filename     => $filename,
             dependencies => $dependencies,
             todos        => $todos,
             linenum      => $linenum,
@@ -904,7 +960,7 @@ sub pod {
 
     my ( $module, $explorer, $add ) = @{$options}{qw(module explorer add)};
 
-    my %modules = reverse %{ $explorer->get_modules };
+    my %modules = %{ $explorer->get_modules || {} };
 
     my $config = $explorer->get_config;
 
@@ -912,13 +968,11 @@ sub pod {
 
     my @extra_paths = split /:/xsm, $config->{perl5lib};
 
-    my $file = $modules{$module};
+    my $id = $modules{$module};
 
-    if ( !$file ) {
-        $file = find_module( $r, $module, @extra_paths );
-    }
-
-    return if !$file;
+    my $file = $id ? $explorer->get_file_info->{$id}->{vpath} : find_module( $r, $module, @extra_paths );
+    return
+      if !$file;
 
     if ($add) {
         add_pod( file => $file, append => 1, config => $config );

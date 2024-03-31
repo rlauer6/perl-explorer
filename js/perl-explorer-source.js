@@ -73,7 +73,8 @@ $(document).ready(function () {
     module = $('#pe-dependencies option:selected').text();
 
     if ( is_local == "1" ) {
-      window.open('/explorer/source/' + module, '_blank');
+      var repo = $('#repo').val();
+      window.open('/explorer/' + repo + '/source/' + module, '_blank');
     }
     else {
       window.open('/explorer/pod/' + module, '_blank');
@@ -90,7 +91,8 @@ $(document).ready(function () {
     module = $('#pe-reverse-dependencies option:selected').text();
 
     if ( module != '-- Select --' ) {
-      window.open('/explorer/source/' + module, '_blank');
+      var repo = $('#repo').val();
+      window.open('/explorer/' + repo + '/source/' + module, '_blank');
     }
 
   });

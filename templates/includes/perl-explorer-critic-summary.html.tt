@@ -4,13 +4,15 @@
   
   <table id="pe-critic-summary-detail-table">
     <thead>
-      <th>Line Count</th>
-      <th>Dependency Count</th>
-      <th>Methods</th>
-      <th>Has Pod</th>
-      <th>Is Tidy</th>
-      <th>Violations</th>
-      <th>Avg Complexity</th>
+      <tr>
+        <th>Line Count</th>
+        <th>Dependency Count</th>
+        <th>Methods</th>
+        <th>Has Pod</th>
+        <th>Is Tidy</th>
+        <th>Violations</th>
+        <th>Avg Complexity</th>
+      </tr>
     </thead>
     <tbody>
       <tr>

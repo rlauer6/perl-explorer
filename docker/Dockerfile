@@ -8,7 +8,7 @@ RUN yum install -y httpd mod_perl perl-libapreq2
 ########################################################################
 # Additional yum packages for this application
 ########################################################################
-RUN yum install -y libtidyp libtidyp-devel
+RUN yum install -y libtidy libtidy-devel
 
 ########################################################################
 # Perl dependencies - application

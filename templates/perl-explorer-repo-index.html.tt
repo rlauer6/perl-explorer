@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  [% INCLUDE "perl-explorer-header.html.tt" %]
+  
+  <body>
+
+    [% INCLUDE "perl-explorer-hamburger-menu.html.tt" %]
+    
+    <div id="perl-explorer">
+
+      <div id="header">
+        <img src="[% logo %]" />
+      </div>
+
+      [% INCLUDE "perl-explorer-status-message.html.tt" %]
+      
+      <div id="pe-repo-listing-container" >
+        <select id="pe-repo-listing">
+        [% FOREACH r IN repo_listing.keys() %]
+          <option value="[% r %]">[% r %]</option>
+        [% END %]
+        </select>
+        
+        <button id="pe-button-explore" class="pe-button">Explore</button>
+      </div>
+      
+    </div>
+    
+    <div class="spinner"></div>
+  </body>
+</html>

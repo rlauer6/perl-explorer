@@ -32,6 +32,7 @@ JS = \
    perl-explorer-common.js \
    perl-explorer-critic.js \
    perl-explorer-markdown.js \
+   perl-explorer-repo-index.js \
    perl-explorer-source.js
 
 IMAGES = \
@@ -39,15 +40,16 @@ IMAGES = \
    loading.gif
 
 TEMPLATES = \
-   perl-explorer-index.html.tt \
    perl-explorer-critic.html.tt \
    perl-explorer-error.html.tt \
-   perl-explorer-source.html.tt \
+   perl-explorer-index.html.tt \
    perl-explorer-markdown.html.tt \
-   includes/perl-explorer-status-message.html.tt \
+   perl-explorer-repo-index.html.tt \
+   perl-explorer-source.html.tt \
    includes/perl-explorer-critic-summary.html.tt \
-   includes/perl-explorer-markdown-menu.html.tt \
    includes/perl-explorer-hamburger-menu.html.tt \
+   includes/perl-explorer-markdown-menu.html.tt \
+   includes/perl-explorer-status-message.html.tt \
    includes/perl-explorer-header.html.tt
 
 CONFIG = \

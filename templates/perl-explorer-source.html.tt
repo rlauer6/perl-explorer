@@ -1,15 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-  [% title = module %]
-
   [% INCLUDE "perl-explorer-header.html.tt" %]
   
   <body>
-    
     <div id="pe-header-container">
-      <i class="pe-pager fas fa-caret-down"></i>
+      <input type="hidden" id="repo" value="[% repo %]">
       
+      <i class="pe-pager fas fa-caret-down"></i>
+      [% IF subs.size() %]
       <label for="pe-subs">Subroutines</label>
       <select id="pe-subs">
         <option value="">-- Select --</option>
@@ -17,8 +16,9 @@
         <option value="[% s.0 %]">[% s.1 %]</option>
         [% END -%]
       </select>
-
+      [% END %]
       
+      [% IF dependencies %]
       <label for="pe-dependencies">Dependencies</label>
       <select id="pe-dependencies">
         <option value="">-- Select --</option>
@@ -26,7 +26,9 @@
         <option value="[% dependencies.is_local.$d %]">[% d %]</option>
         [% END -%]
       </select>
-
+      [% END %]
+      
+      [% IF dependencies.reverse_dependencies %]
       <label for="pe-reverse-dependencies">Used In</label>
       <select id="pe-reverse-dependencies">
         <option value="">-- Select --</option>
@@ -34,7 +36,8 @@
         <option value="[% m %]">[% m %]</option>
         [% END -%]
       </select>
-
+      [% END %]
+      
       <label for="pe-lines">Lines</label>
       <span id="pe-lines">[% lines %]</span>
 

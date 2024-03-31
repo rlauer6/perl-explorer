@@ -1,3 +1,86 @@
+Fri Mar 29 17:12:47 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[explorer everything]:
+	* js/perl-explorer-repo-index.js: new
+	* templates/perl-explorer-repo-index.html.tt: new
+	* Makefile: add above to build
+	* css/perl-explorer.css
+	- source styling
+	* docker/Dockerfile
+	- use libtidy, not libtidyp
+	* docker/requires
+	- HTML::Tidy5, not ::Tidy
+	- Text::Gitignore
+	* js/perl-explorer-source.js: add repo to paths
+	* js/perl-explorer.js
+	- likewise
+	- add repo to markdown path
+	* lib/Apache/Devel/Explorer
+	(parse_uri): new
+	(handler)
+	- handle repo in path
+	- file ids in uri now, not just module names
+	- better regexp for markdown id
+	(explorer): handle repo in URI
+	(init_explorer): pass repo
+	(show_markdown)
+	- simplified calls for Devel::Explorer::Markdown
+	(show_source)
+	- use file id in uri
+	- set inputlang based on ext
+	- dependency listing for .p files
+	(pod)
+	- find module's file using file map
+	* lib/Devel/Explorer.pm
+	- use HTML::Tidy5
+	- create a file_info structure for all files in repo
+	- use Text::Gitignore for filtering files & dirs
+	(init)
+	- create file_map, modules listing from file_info
+	(update_pod_status): removed
+	(fetch_config): renamed from init_config()
+	(create_tree): reworked for use with file_info
+	(traverse_tree): likewise
+	(walk_tree): likewise
+	(show_branch): likewise
+	(directory_index_body): likwise
+	(fetch_file_list): new
+	(get_file_by_id): new
+	(get_file_by_module): refactored version of get_module_path()
+	* lib/Devel/Explorer/Markdown.pm
+	(set_defaults):
+	- file passed in instead of using list of files
+	* lib/Devel/Explorer/Search.pm
+	(find_modules): removed
+	(search_all): use explorer to get list of files to search
+	* lib/Devel/Explorer/Source.pm
+	(set_defaults): set inputlang based on extension of file
+	(set_default_inputlang): new
+	(fetch_source): refactored
+	(highlight)
+	- pass repo, title for rendering
+	(create_reverse_dependency_listing)
+	- use file_info
+	(create_dependency_listing): only for .pm files
+	* lib/Devel/Explorer/ToDo.pm
+	(save_tods): use get_file_by_module()
+	* lib/Devel/Explorer/Utils.pm
+	- %SOURCE_HIGHLIGHT_MAP for syntax highlighting of all file types
+	(fetch_ignore_list): new
+	(fetch_source_from_module): refactored
+	* templates/includes/perl-explorer-critic-summary.html.tt
+	- missing <tr>
+	* templates/perl-explorer-index.html.tt
+	- added <title>
+	- added alt attr to img tag
+	* templates/perl-explorer-source.html.tt
+	- title is passed in now
+	- added hidden element for repo name
+	- conditionally add elements relevant to modules or scripts
+	* templates/perl-explorer.json.tt
+	- add ignore element
+	- repo is now an object
+
 Mon Mar 25 13:37:38 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[nits & bugs] :

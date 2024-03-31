@@ -46,19 +46,25 @@
     color: #008000;
 }
 
-.module.pod:hover {
+.pe-source-file:hover {
+    font-weight: 600;
+    font-size: 130%;
+    cursor: pointer;
+}
+
+.pe-module.pod:hover {
     font-weight: 600;
     font-size: 130%;
     color: #008000;
 }
 
-.module:hover {
+.pe-module:hover {
     color: #800000;
     font-weight: 600;
     font-size: 130%;
 }
 
-.module {
+.pe-module {
     cursor: pointer;
     color: black;
 }
@@ -75,22 +81,23 @@
     position: absolute;
     display: none;
     cursor: pointer;
+    background: #036795;
     border: solid 1px #aaaaaa;
-    background: #333333;
     display: inline-block;
 }
 
-li.menu:hover {
+.menu li:hover {
     color: white;
-    background: #333333;
+    font-weight: bold;
+    background: #333;
 }
 
 .menu li {
     margin: 0px;
     padding: 5px 10px 8px 10px;
-    font-weight: 600;
+    font-weight: bolder;
     list-style: none;
-    color:#aaaaaa;
+    color:white;
     font-size: 14px;
     font-family: verdana, arial, helvetica, sans-serif;
 }

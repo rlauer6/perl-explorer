@@ -4,12 +4,13 @@ use strict;
 use warnings;
 
 use Devel::Explorer::Utils qw(:all);
-use English                qw(-no_match_vars);
+use English qw(-no_match_vars);
 use File::Find;
 use Scalar::Util qw(reftype);
+use List::Util qw(uniq);
 
 __PACKAGE__->follow_best_practice;
-__PACKAGE__->mk_accessors(qw(modules package_names anchored explorer source));
+__PACKAGE__->mk_accessors(qw(anchored explorer source namespace));
 
 use parent qw(Devel::Explorer::Base);
 
@@ -35,14 +36,12 @@ sub search {
         $regexp = $anchored ? qr/^$text$/ixsm : qr/$text/ixsm;
     }
     else {
-        if (reftype($regexp) ne 'REGEXP' ) {
-            if ($regexp !~/^qr/xsm ) {
+        if ( reftype($regexp) ne 'REGEXP' ) {
+            if ( $regexp !~ /^qr/xsm ) {
                 $regexp = "qr$regexp";
             }
 
-            $regexp = eval "$regexp"; ## no critic
-
-            dbg regexp => $regexp;
+            $regexp = eval "$regexp";  ## no critic
         }
 
         die "not a valid regexp\n"
@@ -68,41 +67,12 @@ sub search {
 
     foreach my $line (@source_lines) {
         ++$linenum;
-        next if $line !~ /$regexp/; ## no critic
+        next if $line !~ /$regexp/;  ## no critic
 
         push @results, [ $linenum, $line ];
     }
 
     return \@results;
-}
-
-########################################################################
-sub find_modules {
-########################################################################
-    my ( $self, $path ) = @_;
-
-    my @modules;
-
-    find(
-        sub {
-            return if !/[.]pm$/xsm;
-            push @modules, $File::Find::name;
-        },
-        $path
-    );
-
-    my %paths;
-
-    foreach my $module (@modules) {
-        my $module_path = $module;
-
-        $module =~ s/$path\///xsm;
-        $module =~ s/\//$DOUBLE_COLON/xsmg;
-        $module =~ s/[.]pm$//xsm;
-        $paths{$module_path} = $module;
-    }
-
-    return \%paths;
 }
 
 ########################################################################
@@ -112,31 +82,26 @@ sub search_all {
 
     my $options = get_args(@args);
 
-    my ( $explorer, $namespace, $text, $path, $modules, $regexp, $callback )
-      = @{$options}{qw(explorer namespace text path modules regexp callback)};
+    my ( $namespace, $text, $explorer, $regexp, $callback )
+      = @{$options}{qw(namespace text explorer regexp callback)};
 
-    if ( !$modules ) {
-        if ($explorer) {
-            $modules = $explorer->get_modules;
-        }
-        else {
+    $explorer  //= $self->get_explorer;
+    $namespace //= $self->get_namespace;
 
-            die "no path\n"
-              if !$path;
+    die "explorer is required\n"
+      if !$explorer;
 
-            $modules //= $self->find_modules($path);
-        }
-    }
+    my $modules = $explorer->get_modules;
 
-    my @file_list = keys %{$modules};
-
-    my %package_names = reverse %{$modules};
+    my @ids = uniq values %{$modules};
 
     if ($namespace) {
-        @file_list = map { /^${namespace}::/xsm ? $package_names{$_} : () } keys %package_names;
+        @ids = uniq map { /^${namespace}::/xsm ? $modules->{$_} : () } keys %{$modules};
     }
 
     my %compiled_results;
+
+    my @file_list = $explorer->get_file_by_id(@ids);
 
     foreach my $file (@file_list) {
 
@@ -165,18 +130,21 @@ sub search_all {
 sub main {
 ########################################################################
 
-    my $path      = shift @ARGV;
     my $text      = shift @ARGV;
     my $namespace = shift @ARGV;
 
+    die "TODO: this won't work with out a configuration file\n";
+
+    my $explorer = Devel::Explorer->new();
+
     die "usage: $PROGRAM_NAME path text [namespace]\n"
-      if !$path || !$text;
+      if !$text;
 
     my $search = __PACKAGE__->new();
 
     dbg results => $search->search_all(
         regexp    => qr/$text/xsmi,
-        path      => $path,
+        explorer  => $explorer,
         namespace => $namespace
     );
 

@@ -19,10 +19,12 @@ $(document).ready(function () {
   var root = $('#tree').children().first();
   toggle_children(root.next());
   
-  $('.module').on('click', function() {
-    var module = $(this).text()
+  // show source
+  $('.pe-source-file').on('click', function() {
+    var id = $(this).attr('id');
     clear_context();
-    var uri = '/explorer/source/' + module;
+    var repo = $('title').text();
+    var uri = '/explorer/' + repo.trim() + '/source/' + id;
     window.open(uri, '_blank');
   });
 
@@ -97,7 +99,9 @@ $(document).ready(function () {
   });
   
   $('#pe-markdown-container button').on('click', function() {
-    $('#pe-markdown-iframe').attr('src','/explorer/markdown/'+$('#pe-markdown-select').val());
+    var id = $('#pe-markdown-select').val();
+    var repo = $('title').text().trim();
+    $('#pe-markdown-iframe').attr('src','/explorer/' + repo + '/markdown/' + id);
   });
 
   $('html').on('click', function() {
