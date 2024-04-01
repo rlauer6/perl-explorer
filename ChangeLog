@@ -1,6 +1,42 @@
+Mon Apr  1 17:15:22 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[critic fixes, elipsis menu]:
+	* js/perl-explorer.css
+	- fix uri for critic
+	- click on span (pe-display-name) instead of li
+	- click on elipsis for context menu
+	* lib/Apache/Devel/Explorer.pm
+	(handler)
+	- use file id in source uri
+	- use file id or module name for critic uri
+	(api_source_lines): use file id to fetch file
+	(show_critique): use file_id
+	(guess_module_name): new
+	(critique)
+	- use file id
+	- pass explorer to Source
+	* lib/Devel/Explorer.pm
+	(has_pod): use file id
+	(show_branch)
+	- use file_info structure
+	- add pe-pod class
+	(verify_id): new
+	* lib/Devel/Explorer/Source.pm
+	(highlight_source_lines): fix regex to remove comment
+	(higlight): likewise
+	(fetch_source)
+	- source takes precedence
+	* css/perl-explorer-source.css
+	- styling tweaks
+	* css/perl-explorer.css
+	(.pe-pod:hover): new
+	(.pe-vertical-elipsis): new
+	(#pe-critic-summary): fix positioning
+	* templates/perl-explorer-source.html.tt: tweak padding for icon
+
 Mon Apr  1 11:04:40 2024  Rob Lauer  <rlauer6@comcast.net>
 
-	[]:
+	[new file attributes]:
 	* templates/includes/perl-explorer-search.html.tt
 	* Makefile: add above to build
 	* templates/perl-explorer-search.html.tt

@@ -109,7 +109,7 @@
       
       <p>
         <i class="fa fa-info fa-lg"></i>
-        Click the search icon <i class="fa fa-search-plus"></i> to
+        Click the search icon <i style="padding-left:10px;" class="fa fa-search-plus"></i> to
         search this file or the entire repo. Use a regular expression
         like "/(foo|bar)/i" to using a regexp. The result lists for
         repo search will allow you to navigate to the file by clicking

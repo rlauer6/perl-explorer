@@ -165,9 +165,11 @@ sub get_file_by_module {
 ########################################################################
 sub has_pod {
 ########################################################################
-  my ( $self, $module ) = @_;
+  my ( $self, $id ) = @_;
 
-  my $id = $self->get_modules->{$module};
+  if ( $id !~ /^[[:digit:]a-f]{32}$/xsm ) {
+    $id = $self->get_modules->{$id};
+  }
 
   return
     if !$id;
@@ -326,7 +328,8 @@ END_OF_HTML
 
   my @files = @{ $branches->{$this_branch} || [] };
 
-  my $file_map = $options->{file_map};
+  my $file_map  = $options->{explorer}->get_file_map;
+  my $file_info = $options->{explorer}->get_file_info;
 
   if (@files) {
 
@@ -338,13 +341,24 @@ END_OF_HTML
       my $display_name = $_;
       $display_name =~ s/$root\/?//xsm;
 
-      my $class = 'pe-source-file';
+      my @classes = 'pe-source-file';
 
       if ( $display_name =~ /[.]pm$/xsm ) {
-        $class = $class . ' pe-module';
+        push @classes, 'pe-module';
       }
 
-      push @li, sprintf '<li id="%s" class="%s">%s</li>', $id, $class, $display_name;
+      if ( $file_info->{$id}->{has_pod} ) {
+        push @classes, 'pe-pod';
+      }
+
+      dbg file_info => $file_info->{$id};
+
+      my $class = sprintf 'class="%s"', join q{ }, @classes;
+
+      push @li,
+        sprintf
+        '<li id="%s" %s><span class="pe-display-name">%s</span><span class="pe-vertical-elipsis">&#x22EE;</span></li>',
+        $id, $class, $display_name;
     }
 
     $options->{html} .= sprintf qq{\n<div class="branch branch_$id">\n<ul>\n%s\n</ul>\n</div>\n}, join "\n", @li;
@@ -399,7 +413,7 @@ sub directory_index_body {
     branches => $branches,
     html     => q{},
     root     => $root,
-    file_map => $self->get_file_map,
+    explorer => $self,
   };
 
   my (@path) = split /\//xsm, $root;
@@ -619,6 +633,18 @@ sub fetch_file_list {
   }
 
   return \%file_info;
+}
+
+########################################################################
+sub verify_id {
+########################################################################
+  my ( $explorer, $id ) = @_;
+
+  if ( $id !~ /^[[:digit:]a-f]{32}$/xsm ) {
+    return $explorer->get_modules->{$id};
+  }
+
+  return $id;
 }
 
 ########################################################################

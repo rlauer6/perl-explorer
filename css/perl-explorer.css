@@ -52,7 +52,7 @@
     cursor: pointer;
 }
 
-.pe-module.pod:hover {
+.pe-module.pe-pod:hover {
     font-weight: 600;
     font-size: 130%;
     color: #008000;
@@ -66,7 +66,13 @@
 
 .pe-module {
     cursor: pointer;
-    color: black;
+}
+
+.pe-vertical-elipsis {
+    visibility: hidden;
+    font-size: 120%;
+    font-weigth: bold;
+    padding-left: 30px;
 }
 
 #context {
@@ -197,15 +203,18 @@ li {
 }
 
 #pe-critic-summary  {
+    position: absolute;
+    left: 10%;
+    top: 0%;
+    z-index: 999;
     display: none;
-    background: #fff;
     font-family: monospace;
     font-size: 16px;
     border: 1px solid #aaa;
     border-radius:15px;
     padding:  15px;
     margin-top: 0px;
-    background: #eee;
+    background: #fff;
     width: fit-content
 }
 
@@ -255,7 +264,7 @@ h1.pe-critic-heading {
 #perl-explorer {
     padding: 15px;
     float: left;
-    background: #f0f0f0;
+    background: #f0f0ff;
     margin-left: 10px;
     border-radius: 12px;
     border: 1px solid #aaa;
@@ -368,7 +377,6 @@ li.pe-critic-dependency-item:hover {
 
 #pe-critic-module-dependency-container {
 }
-
 
 .pe-critic-violations {
     display: inline-block;

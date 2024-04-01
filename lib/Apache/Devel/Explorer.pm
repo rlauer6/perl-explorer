@@ -168,14 +168,10 @@ sub handler {
   }
 
   if ( $uri_path =~ /source\/(.+)$/xsm ) {
-    my $id = $1;
+    my $id = $explorer->verify_id($1);
 
-    if ( $id !~ /^[[:digit:]a-f]{32}$/xsm ) {
-      $id = $explorer->get_modules->{$id};
-
-      return $NOT_FOUND
-        if !$id;
-    }
+    return $NOT_FOUND
+      if !$id;
 
     return show_source( $r, id => $id, explorer => $explorer );
   }
@@ -185,7 +181,9 @@ sub handler {
   }
 
   if ( $uri_path =~ /^critic\/(.+)$/xsm ) {
-    return show_critique( $r, module => $1, explorer => $explorer );
+    my $id = $explorer->verify_id($1);
+
+    return show_critique( $r, id => $id, explorer => $explorer );
   }
 
   return html_error(
@@ -410,7 +408,9 @@ sub api_source_lines {
 
   my $line_number = $req->param('line_number');
 
-  my $source = eval { return fetch_source_from_module( explorer => $explorer, module => $module ); };
+  my $file = $explorer->get_file_by_module($module);
+
+  my $source = slurp_file $file;
 
   if ( !$source || $EVAL_ERROR ) {
     output_json( $r, { error => 'not found' }, $NOT_FOUND );
@@ -878,10 +878,10 @@ sub show_critique {
 
   my $options = get_args(@args);
 
-  my ( $module, $explorer ) = @{$options}{qw(module explorer)};
+  my ( $id, $explorer ) = @{$options}{qw(id explorer)};
   my $config = $explorer->get_config;
 
-  my $critique = eval { critique( module => $module, explorer => $explorer ); };
+  my $critique = eval { critique( id => $id, explorer => $explorer ); };
 
   if ( !$critique || $EVAL_ERROR ) {
     return api_error( $r, $EVAL_ERROR, $SERVER_ERROR );
@@ -905,16 +905,39 @@ sub show_critique {
 }
 
 ########################################################################
+sub guess_module_name {
+########################################################################
+  my ( $explorer, $id, @module_list ) = @_;
+
+  return $module_list[0]
+    if @module_list == 1;
+
+  my $filename = $explorer->get_file_info->{$id}->{name};
+  $filename =~ s/[.][^.]+$//xsm;
+
+  my ($module) = grep { $_ =~ /$filename/ } @module_list;
+
+  return $module ? $module : $module_list[0];
+}
+
+########################################################################
 sub critique {
 ########################################################################
   my @args = @_;
 
   my $options = get_args(@args);
 
-  my ( $module, $explorer ) = @{$options}{qw(module explorer)};
+  my ( $id, $explorer ) = @{$options}{qw(id  explorer)};
   my $config = $explorer->get_config;
 
-  my $source = fetch_source_from_module( explorer => $explorer, module => $module );
+  my $file = $explorer->get_file_by_id($id);
+
+  my $source  = slurp_file $file;
+  my $modules = $explorer->get_modules;
+
+  my @module_list = grep { $id eq $modules->{$_} } keys %{$modules};
+
+  my $module = guess_module_name( $explorer, $id, @module_list );
 
   my $critic = Devel::Explorer::Critic->new(
     module => $module,
@@ -932,7 +955,7 @@ sub critique {
   # see if this module has pod
   $stat_summary->{has_pod} = $explorer->has_pod($module);
 
-  my $source_explorer = Devel::Explorer::Source->new( source => $source, config => $config );
+  my $source_explorer = Devel::Explorer::Source->new( source => $source, config => $config, explorer => $explorer );
 
   # get the list of dependencies
   $stat_summary->{dependency_listing} = $source_explorer->create_dependency_listing(

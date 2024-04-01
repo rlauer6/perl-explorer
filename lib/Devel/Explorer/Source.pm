@@ -123,7 +123,7 @@ sub highlight_source_lines {
 
   foreach my $line (@source) {
     $line = $highlighter->highlightString( $line, $self->get_inputlang );
-    $line =~ s/<\![^>]+-->\n<pre>//xsm;
+    $line =~ s/\s*<\![^>]+-->//xsm;
     chomp $line;
 
     $line = sprintf '<pre class="pe-critic-context">[%05d] %s', ++$line_number, $line;
@@ -137,13 +137,11 @@ sub fetch_source {
 ########################################################################
   my ( $self, $file ) = @_;
 
-  $file //= $self->get_file_info->{vpath};
-
-  my $source;
-
-  if ( !$file ) {
-    $source = $self->get_source;
+  if ( $self->get_file_info ) {
+    $file //= $self->get_file_info->{vpath};
   }
+
+  my $source = $self->get_source;
 
   return $source
     if $source;
@@ -176,7 +174,9 @@ sub highlight {
     if $EVAL_ERROR || !$source;
 
   my $highlighted_source = $highlighter->highlightString( $source, $self->get_inputlang );
-  $highlighted_source =~ s/\A<pre/<pre class="pe-source-container">/xsm;
+  $highlighted_source =~ s/\s*<\![^>]+-->\n//xsm;
+
+  $highlighted_source =~ s/\A<pre/<pre class="pe-source-container"/xsm;
 
   # TODO: fix regexp
   if ( $options->{add_links} ) {

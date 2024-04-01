@@ -2,13 +2,13 @@
 // (c) Copyright 2024, TBC Development Group, LLC
 // All rights reserved.
 // ########################################################################
+var repo;
 
 // ########################################################################
 $(document).ready(function () {
 // ########################################################################
+  repo = $('title').text().trim();
 
-  // disable context menu
-  document.oncontextmenu = function ()  { return false };
   // close all folders
   
   // open root folder
@@ -20,10 +20,10 @@ $(document).ready(function () {
   toggle_children(root.next());
   
   // show source
-  $('.pe-source-file').on('click', function() {
-    var id = $(this).attr('id');
+  $('.pe-display-name').on('click', function() {
+    var id = $(this).parent().attr('id');
+    
     clear_context();
-    var repo = $('title').text();
     var uri = '/explorer/' + repo.trim() + '/source/' + id;
     window.open(uri, '_blank');
   });
@@ -35,11 +35,36 @@ $(document).ready(function () {
   $('.pe-button-detail').on('click', function() {
     $(this).parent().css('display', 'none');
     var module = $('#pe-critic-module-name').text();
-    var uri = '/explorer/critic/' + module + '?display=1';
+    var uri = '/explorer/' + repo + '/critic/' + module + '?display=1';
+
     window.open(uri, '_blank');
-    
   });
-                     
+  
+  $('.pe-vertical-elipsis').on('click', function(e) {
+    var li = $(this).parent()
+    $(li).addClass('selected-module');
+
+    show_menu(li, e.pageX, $(this));
+  });
+  
+  $('li').mouseenter(function(){
+    $('.pe-vertical-elipsis').css('visibility', 'hidden');
+    
+    var el = $(this).children('.pe-vertical-elipsis');
+
+    console.log(el[0]);
+    
+    if ( el.length) {
+      $(el[0]).css('visibility', 'visible');
+    }
+  }).mouseleave(function() {
+      var el = $(this).children('.pe-vertical-elipsis');
+
+      if ( el.length ) {
+        $(el[0]).css('visibility', 'hidden');
+      }
+    });
+  
   // ###################################################################
   // hamburger menu
   // ###################################################################
@@ -58,7 +83,9 @@ $(document).ready(function () {
     
     var module = $('.selected-module');
 
-    var uri = '/explorer/' + item + '/' + module.text();
+    var id = $(module).attr('id');
+    
+    var uri = '/explorer/' + repo + '/' + item + '/' + id;
 
     clear_context();
 
@@ -100,7 +127,6 @@ $(document).ready(function () {
   
   $('#pe-markdown-container button').on('click', function() {
     var id = $('#pe-markdown-select').val();
-    var repo = $('title').text().trim();
     $('#pe-markdown-iframe').attr('src','/explorer/' + repo + '/markdown/' + id);
   });
 
@@ -110,31 +136,22 @@ $(document).ready(function () {
     }
   });
   
-  // ###################################################################
-  // context menu
-  // ###################################################################
-  $('.module').on('contextmenu', function(e) {
-    clear_context();
+// ########################################################################
+function show_menu(li, x, menu) { 
+// ########################################################################
+  var offset = $(li).offset();
     
-    var offset = $(this).offset();
-    
-    $(this).css("opacity", .5);
-    $(this).addClass('selected-module');
-    
-    $('#context').css({ 
-      position: "absolute",
-      marginLeft: 0,
-      marginTop: 0,
-      top:  offset.top + $(this).height(),
-      left: offset.left + 10 , // + $(this).width(),
+  $('#context').css({ 
+    position: "absolute",
+    marginLeft: 0,
+    marginTop: 0,
+    top:  offset.top + $(li).height() - 10,
+    left: x,  //offset.left + $(li).width(),
       "z-index": 9999
-    }).appendTo('body');
-    
-    $('#context').css('display', 'inline-block');
-
-  });
+  }).appendTo('body');
   
-});
+  $('#context').css('display', 'inline-block');
+}
 
 // ########################################################################
 function add_pod(uri, module) {
