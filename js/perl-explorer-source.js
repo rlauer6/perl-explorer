@@ -97,6 +97,14 @@ $(document).ready(function () {
 
   });
 
+  $('#pe-scripts-only').on('click', function() {
+    $("#pe-modules-only").prop('checked', false);
+  });
+
+  $('#pe-modules-only').on('click', function() {
+    $("#pe-scripts-only").prop('checked', false);
+  });
+  
   $('#pe-reverse-dependencies').val('').prop('selected', true);
 
 
@@ -249,13 +257,13 @@ function search_text() {
   // #####################################################################
   var text = $('#pe-search-text').val();
 
-  var is_repo_search = $('#pe-repo-search').is(":checked");
+  var is_repo_search = $('#pe-repo-search').is(":checked") ? 1 : 0 ;
+  
+  var modules_only = $('#pe-modules-only').is(":checked") ? 1 : 0;
+  
+  var scripts_only = $('#pe-scripts-only').is(":checked") ? 1 : 0;
 
-  var repo_search = is_repo_search ? 1 : 0;
-
-  var regexp = $('#pe-regexp').is(":checked");
-
-  regexp = regexp ? 1 : 0;
+  var regexp = $('#pe-regexp').is(":checked") ? 1 : 0;
 
   var module = $('title').text();
 
@@ -263,16 +271,24 @@ function search_text() {
 
   $('body').addClass('loading');
 
+  var repo = $('#repo').val();
+  var url = '/explorer/' + repo + '/source/search';
+  var file_id = $('#file_id').val();
+  
   $.ajax({
-    url: '/explorer/source/search',
+    url: url,
     data: {
-      'repo-search': repo_search,
+      'repo-search': is_repo_search,
       'search-term': text,
       'regexp': regexp,
-      'module': module
+      'module': module,
+      'modules_only': modules_only,
+      'scripts_only': scripts_only,
+      'file_id': file_id
     }
   }).done(function (data) {
-
+    console.log(data);
+    
     $('body').removeClass('loading');
 
     $('#pe-search-results-table').DataTable().destroy();
@@ -281,7 +297,7 @@ function search_text() {
 
     $('.pe-search-linenum, .pe-search-module').off('click');
 
-    if ( repo_search ) {
+    if ( is_repo_search ) {
       if ( !data.length ) {
         display_error_message('nothing found');
       }
@@ -314,13 +330,23 @@ function search_text() {
         });
       });
 
-    $('#pe-search-results-table').DataTable({
-      bAutoWidth: false,
-      columns: [ null, null, { width: "100%" } ]
-    });
-
+    $('#pe-search-results').css('height','80vh');
+    
     $('#pe-search-results').css('display', 'inline-block');
 
+    $('#pe-search-results-table').off('draw.dt');
+
+    $('#pe-search-results-table').DataTable({
+      bAutoWidth: false,
+      columns: [ {width: "35%"}, null, { width: "650%" } ]
+    });
+
+    set_search_results_height();
+    
+    $('#pe-search-results-table').on('draw.dt', function() {
+      set_search_results_height();
+    });
+    
     // open_modal('pe-search-results');
     $('#pe-search-results').mousedown(handle_mousedown);
 
@@ -343,6 +369,22 @@ function search_text() {
 }
 
 // #####################################################################
+function set_search_results_height() {
+// #####################################################################
+  var el = document.getElementById('pe-search-results');
+
+  console.log(el.clientHeight + ' ' + el.scrollHeight);
+
+  $('#pe-search-results').css('height','80vh');
+  $('#pe-search-results').css('overflow', 'scroll');
+  
+  if ( el.clientHeight >= el.scrollHeight) {
+    $('#pe-search-results').css('height','');
+    $('#pe-search-results').css('overflow', 'hidden');
+  }
+}
+
+// #####################################################################
 function move_to_linenum(elem) {
   // #####################################################################
 
@@ -361,8 +403,13 @@ function move_to_linenum(elem) {
 function set_linenum_handler(is_local) {
   // #####################################################################
   if ( is_local ) {
-    $('.pe-search-linenum, .pe-search-module').on('click', function() {
-      move_to_line( elem, linenum);
+    $('.pe-search-module').on('click', function() {
+      
+      move_to_linenum( this, linenum );
+    });
+    
+    $('.pe-search-linenum').on('click', function() {
+      move_to_linenum( this, linenum );
     });
   }
   else {

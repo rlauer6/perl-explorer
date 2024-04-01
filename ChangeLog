@@ -1,3 +1,50 @@
+Mon Apr  1 11:04:40 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[]:
+	* templates/includes/perl-explorer-search.html.tt
+	* Makefile: add above to build
+	* templates/perl-explorer-search.html.tt
+	- modules/scripts only flag
+	- move search container HTML to includes file
+	- only reverse dependencies for modules
+	- show file info (permissions, size)
+	* docker/requires
+	- add Stat::lsMode, HTML::Escape, Number::Bytes::Human
+	* lib/Apache/Devel/Explorer.pm
+	(api_search)
+	- add new options for module, scripts only
+	- support search files or modules
+	(show_source): use file_info
+	* lib/Devel/Explorer.pm
+	(init)
+	- conditionally set ignore, allow list
+	(has_pod): just return if can't find id
+	(fetch_file_list)
+	- only set ignore, allow lists if they are not empty
+	- add new elements to file_info structure
+	* lib/Devel/Explorer/Search.pm
+	(search): syntax higlight search results
+	(search_all)
+	- support for module/scripts only flags
+	* lib/Devel/Explorer/Source.pm
+	(set_defaults): use file_info
+	(fetch_source)
+	- use file_info
+	- add additional file attributes to page
+	(create_reverse_dependency_listing):
+	- restrict search to modules only
+	* lib/Devel/Explorer/Utils.pm
+	- add $EXPLORER_ROOT
+	* css/perl-explorer-source.css
+	- + .pe-file-info for new fileattributes
+	* css/perl-explorer.css
+	- pretty up the tree
+	* js/perl-explorer-source.js
+	- support for new module/scripts only flags
+	- add repo to search uri
+	- modify height of search results back if overflow
+	- widen file/module column in search results
+	- fix local line number navigation
 Fri Mar 29 17:12:47 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[explorer everything]:

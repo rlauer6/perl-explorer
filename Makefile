@@ -50,6 +50,7 @@ TEMPLATES = \
    includes/perl-explorer-hamburger-menu.html.tt \
    includes/perl-explorer-markdown-menu.html.tt \
    includes/perl-explorer-status-message.html.tt \
+   includes/perl-explorer-search.html.tt \
    includes/perl-explorer-header.html.tt
 
 CONFIG = \

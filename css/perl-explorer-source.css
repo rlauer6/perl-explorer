@@ -3,6 +3,14 @@ body {
     background: #eee;
 }
 
+.pe-file-info {
+    background: white;
+    padding: 3px 5px 3px 5px;
+    border: 1px solid black;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
 .modal-container {
     z-index: 999;
     display: none;
@@ -16,6 +24,14 @@ body {
     top:10%
 }
 
+.pe-file-info-container {
+    margin: 10px 0px 10px 15px;
+}
+
+#pe-file-info-container {
+    margin: 10px 10px 20px 15px;   
+}
+
 .pe-search-module {
     cursor: pointer;
 }
@@ -27,10 +43,23 @@ body {
     cursor: pointer;
 }
 
+#pe-search-help {
+    float: right;
+    display: block;
+}
+
+#pe-search-help h2 {
+    display: inline-block;
+    margin: 0px 0px 0px 10px
+}
+
 #pe-search-container div {
-    display: grid;
-    grid-template-columns: auto 1fr;
     padding: 10px;
+}
+
+#pe-search-container-elements {
+    display: grid;
+    grid-template-columns: 1fr;
 }
 
 #pe-search-container label {
@@ -43,10 +72,11 @@ body {
     z-index: 1000;
     position: fixed;
     left: 10%;
-    top: 10%;
+    top: 0%;
     padding: 15px;
     border: 1px solid #555;
     border-radius:12px;
+    overflow: hidden;
 }
 
 #pe-search-results-table {
@@ -58,6 +88,10 @@ body {
 
 .pe-search-linenum {
     cursor: pointer;
+}
+
+.pe-highlighted-line {
+    margin: 0px;
 }
 
 .pe-pager {
@@ -75,8 +109,9 @@ body {
     border: 1px solid #555;
     border-radius: 12px;
     left: 10%;
-    top:10%   
+    top: 10%;
 }
+
 
 #pe-source-info-icon {
     padding-left: 10px;
@@ -110,7 +145,6 @@ body {
 #pe-source-info h2 {
     text-align: center;
 }
-
 
 #pe-source-info p {
     margin-bottom: 25px;
@@ -193,7 +227,7 @@ label {
 
 #pe-source {
     overflow: scroll;
-    height: 95vh;
+    height: 90vh;
     position: fixed;
 }
 

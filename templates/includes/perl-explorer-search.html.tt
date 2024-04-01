@@ -1,0 +1,60 @@
+<div id="pe-search-container">
+
+  <div id="pe-search-help">
+    <i class="fa fa-info-circle fa-lg"></i>
+    <h2>Hints &amp; Tips</h2>
+    
+    <ul>
+      <li>Search the entire repo or the current file</li>
+      <li>Search just Perl modules or scripts</li>
+      <li>Use a regexp like '/(x|y)/i'</li>
+    </ul>
+  </div>
+  
+  <div id="pe-search-container-elements">
+    <div>
+      <input type="checkbox" value="1" name="repo-search" id="pe-repo-search" />
+      <label for="pe-repo-search">Search Repo</label>
+    </div>
+  
+    <div>
+      <input type="checkbox" value="1" name="regexp" id="pe-regexp" />
+      <label for="pe-regexp">Regexp</label>
+    </div>
+    
+    <div>
+      <input type="checkbox" value="1" name="modules-only" id="pe-modules-only" />
+      <label for="pe-modules-only">Modules Only</label>
+    </div>
+    
+    <div>
+      <input type="checkbox" value="1" name="scripts-only" id="pe-scripts-only" />
+      <label for="pe-scripts-only">Scripts Only</label>
+    </div>
+    
+    <div>
+      <label for="pe-search-text">Term or Regexp</label>
+      <input type="text" value="" name="search-text" size="20" id="pe-search-text" />
+    </div>
+  </div>
+  
+  <button id="pe-search-search" class="pe-button">Search</button>
+  <button id="pe-search-cancel" class="pe-button">Cancel</button>
+</div>
+
+<div id="pe-search-results" >
+  <button id="pe-search-results-cancel" class="pe-button">Cancel</button>
+  
+  <table id="pe-search-results-table" class="display">
+    <thead>
+      <tr>
+        <th>File</th>
+        <th>Line</th>
+        <th>Content</th>
+      </tr>
+    </thead>
+    
+    <tbody>
+    </tbody>
+  </table>
+</div>

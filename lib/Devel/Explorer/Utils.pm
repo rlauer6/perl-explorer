@@ -17,6 +17,7 @@ use Text::Wrap;
 use Scalar::Util qw(reftype);
 use Carp;
 use Carp::Always;
+
 use Readonly;
 
 Readonly::Scalar our $DOUBLE_COLON => q{::};
@@ -29,6 +30,7 @@ Readonly::Scalar our $TRUE  => 1;
 Readonly::Scalar our $FALSE => 0;
 
 Readonly::Scalar our $DEFAULT_INCLUDE_PATH => '/usr/loca/share/perl-explorer';
+Readonly::Scalar our $EXPLORER_ROOT        => '/perl-explorer';
 
 Readonly::Hash our %SOURCE_HIGHLIGHT_MAP => (
     '.xml'      => 'xml.lang',
@@ -89,6 +91,11 @@ our %EXPORT_TAGS = (
     maps => [
         qw(
           %SOURCE_HIGHLIGHT_MAP
+        )
+    ],
+    defaults => [
+        qw(
+          $EXPLORER_ROOT
         )
     ],
 );

@@ -7,3 +7,6 @@ Markdown::Render
 Module::ScanDeps::Static
 Template
 Text::Gitignore
+Stat::lsMode
+Number::Bytes::Human
+HTML::Escape

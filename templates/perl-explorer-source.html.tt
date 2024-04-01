@@ -5,48 +5,61 @@
   
   <body>
     <div id="pe-header-container">
-      <input type="hidden" id="repo" value="[% repo %]">
-      
-      <i class="pe-pager fas fa-caret-down"></i>
-      [% IF subs.size() %]
-      <label for="pe-subs">Subroutines</label>
-      <select id="pe-subs">
-        <option value="">-- Select --</option>
-        [% FOR s IN subs %]
-        <option value="[% s.0 %]">[% s.1 %]</option>
-        [% END -%]
-      </select>
-      [% END %]
-      
-      [% IF dependencies %]
-      <label for="pe-dependencies">Dependencies</label>
-      <select id="pe-dependencies">
-        <option value="">-- Select --</option>
-        [% FOR d IN dependencies.modules %]
-        <option value="[% dependencies.is_local.$d %]">[% d %]</option>
-        [% END -%]
-      </select>
-      [% END %]
-      
-      [% IF dependencies.reverse_dependencies %]
-      <label for="pe-reverse-dependencies">Used In</label>
-      <select id="pe-reverse-dependencies">
-        <option value="">-- Select --</option>
-        [% FOR m IN dependencies.reverse_dependencies.keys() %]
-        <option value="[% m %]">[% m %]</option>
-        [% END -%]
-      </select>
-      [% END %]
-      
-      <label for="pe-lines">Lines</label>
-      <span id="pe-lines">[% lines %]</span>
+      <input type="hidden" id="repo" value="[% repo %]" />
+      <input type="hidden" id="file_id" value="[% file_id %]" />
+      <div id="pe-file-info-container">
+          <label for="pe-permissions">Permissions</label>
+          <span id="pe-permissions" class="pe-file-info">[% permissions %]</span>
+          
+          <label for="pe-last-modified">Last Modified</label>
+          <span id="pe-last-modified" class="pe-file-info">[% last_modified %]</span>
 
-      <label for="pe-todo-count">TO DOs</label>
-      <span id="pe-todo-count">[% todos %]</span>
+          <label for="pe-file-size">File Size</label>
+          <span id="pe-file-size" class="pe-file-info">[% size %]</span>
+          
+          <i id="pe-search-icon" class="fa fa-search-plus fa-lg"></i>
+          <i id="pe-source-info-icon" class="fa fa-info-circle fa-lg"></i>
+        </div>
 
-      <i id="pe-search-icon" class="fa fa-search-plus fa-lg"></i>
-      <i id="pe-source-info-icon" class="fa fa-info-circle fa-lg"></i>
-    </div>
+        <div>
+          <i class="pe-pager fas fa-caret-down"></i>
+          [% IF subs.size() %]
+          <label for="pe-subs">Subroutines</label>
+          <select id="pe-subs">
+            <option value="">-- Select --</option>
+            [% FOR s IN subs %]
+            <option value="[% s.0 %]">[% s.1 %]</option>
+            [% END -%]
+          </select>
+          [% END %]
+          
+          [% IF dependencies %]
+          <label for="pe-dependencies">Dependencies</label>
+          <select id="pe-dependencies">
+            <option value="">-- Select --</option>
+            [% FOR d IN dependencies.modules %]
+            <option value="[% dependencies.is_local.$d %]">[% d %]</option>
+            [% END -%]
+          </select>
+          [% END %]
+          
+          [% IF dependencies.reverse_dependencies %]
+          <label for="pe-reverse-dependencies">Used In</label>
+          <select id="pe-reverse-dependencies">
+            <option value="">-- Select --</option>
+            [% FOR m IN dependencies.reverse_dependencies.keys() %]
+            <option value="[% m %]">[% m %]</option>
+            [% END -%]
+          </select>
+          [% END %]
+          
+          <label for="pe-lines">Lines</label>
+          <span id="pe-lines">[% lines %]</span>
+
+          <label for="pe-todo-count">TO DOs</label>
+          <span id="pe-todo-count">[% todos %]</span>
+        </div>
+        
     
     <hr class="pe-divider" />  
 
@@ -66,42 +79,8 @@
       <button id="pe-todo-save" class="pe-button">Save</button>
       <button id="pe-todo-cancel" class="pe-button">Cancel</button>
     </div>
-    
-    <div id="pe-search-container">
 
-      <div>
-        <input type="checkbox" value="1" name="repo-search" id="pe-repo-search" />
-        <label for="pe-repo-search">Search Repo</label>
-      </div>
-      
-      <div>
-        <input type="checkbox" value="1" name="regexp" id="pe-regexp" />
-        <label for="pe-regexp">Regexp</label>
-      </div>
-
-      <div>
-        <label for="pe-search-text">Term or Regexp</label>
-        <input type="text" value="" name="search-text" id="pe-search-text" />
-      </div>
-      
-      <button id="pe-search-search" class="pe-button">Search</button>
-      <button id="pe-search-cancel" class="pe-button">Cancel</button>
-    </div>
-
-    <div id="pe-search-results" >
-      <button id="pe-search-results-cancel" class="pe-button">Cancel</button>
-      
-      <table id="pe-search-results-table" class="display">
-        <thead>
-          <th>Module</th>
-          <th>Line</th>
-          <th>Content</th>
-        </thead>
-        
-        <tbody>
-        </tbody>
-      </table>
-    </div>
+    [% INCLUDE "perl-explorer-search.html.tt" %]
 
     <div id="pe-source-info">
       <h2>Hints & Tips</h2>

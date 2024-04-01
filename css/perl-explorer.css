@@ -253,7 +253,14 @@ h1.pe-critic-heading {
 }
 
 #perl-explorer {
+    padding: 15px;
     float: left;
+    background: #f0f0f0;
+    margin-left: 10px;
+    border-radius: 12px;
+    border: 1px solid #aaa;
+    height: 80vh;
+    overflow: scroll;
 }
 
 #hb-menu {
