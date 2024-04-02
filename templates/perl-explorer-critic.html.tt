@@ -8,6 +8,8 @@
 
     [% INCLUDE "perl-explorer-status-message.html.tt" %]
     
+    <input type="hidden" value="[% repo %]" id="pe-repo" />    
+
     <button class="pe-button" id="pe-save-button">Save</button>
 
     <div id="diagnostic" class="pe-theme-color">

@@ -1,3 +1,28 @@
+Tue Apr  2 15:54:01 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[critic fixes]:
+	* js/perl-explorer-critic.js
+	- add repo to uri for source/lines
+	* js/perl-explorer.js: missing parent and brace, whitespace
+	* lib/Apache/Devel/Explorer.pm
+	(handler)
+	- prep for dispatch table
+	- changed uri for source-lines => source/lines
+	(around_lines): remove unnecessary <pre><tt> wrapper
+	(api_source_lines)
+	- use file id
+	- pass inputlang to highlight_source_lines
+	(critique): pass repo
+	* lib/Devel/Explorer/Critic.pm
+	- added repo to options list
+	* lib/Devel/Explorer/Source.pm
+	(highlight_source_line)
+	- accept inputlang
+	- remove trailing \n
+	(fetch_source): source takes precedence
+	* templates/perl-explorer-critic.html.tt
+	- add repo
+
 Mon Apr  1 17:15:22 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[critic fixes, elipsis menu]:

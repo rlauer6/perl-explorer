@@ -6,7 +6,7 @@ var repo;
 
 // ########################################################################
 $(document).ready(function () {
-// ########################################################################
+  // ########################################################################
   repo = $('title').text().trim();
 
   // close all folders
@@ -58,12 +58,12 @@ $(document).ready(function () {
       $(el[0]).css('visibility', 'visible');
     }
   }).mouseleave(function() {
-      var el = $(this).children('.pe-vertical-elipsis');
+    var el = $(this).children('.pe-vertical-elipsis');
 
-      if ( el.length ) {
-        $(el[0]).css('visibility', 'hidden');
-      }
-    });
+    if ( el.length ) {
+      $(el[0]).css('visibility', 'hidden');
+    }
+  });
   
   // ###################################################################
   // hamburger menu
@@ -108,14 +108,14 @@ $(document).ready(function () {
       window.open(uri, '_blank');
     }
   });
-    
+  
   $('#context').on('mouseleave', function() {
     clear_context();
   });
   
   $('.dir').on('click', function() {
     toggle_children($(this)); // $(this).next().toggle();
-   $(this).children('i').each(function() { $(this).toggle(); });
+    $(this).children('i').each(function() { $(this).toggle(); });
   });
 
   // ###################################################################
@@ -135,19 +135,20 @@ $(document).ready(function () {
       $('#pe-markdown-iframe').css('display', 'none');
     }
   });
-  
+});
+
 // ########################################################################
 function show_menu(li, x, menu) { 
-// ########################################################################
+  // ########################################################################
   var offset = $(li).offset();
-    
+  
   $('#context').css({ 
     position: "absolute",
     marginLeft: 0,
     marginTop: 0,
     top:  offset.top + $(li).height() - 10,
     left: x,  //offset.left + $(li).width(),
-      "z-index": 9999
+    "z-index": 9999
   }).appendTo('body');
   
   $('#context').css('display', 'inline-block');
@@ -155,12 +156,12 @@ function show_menu(li, x, menu) {
 
 // ########################################################################
 function add_pod(uri, module) {
-// ########################################################################
+  // ########################################################################
   
   if ( confirm('No POD in this module. Add POD?') != true ) {
     return false;
   }
-      
+  
   uri = uri + '?add=1';
   
   $.ajax({
@@ -187,7 +188,7 @@ function add_pod(uri, module) {
 
 // ########################################################################
 function critique(uri) {
-// ########################################################################
+  // ########################################################################
 
   $('body').addClass('loading');
   
@@ -200,13 +201,13 @@ function critique(uri) {
 
     console.log(data);
 
-//  subs           => $stats->subs(),
-//  statements     => $stats->statements(),
-//  lines_of_perl  => $stats->lines_of_perl(),
-//  violations     => $stats->violations_by_severity(),
-//  policies       => $stats->violations_by_policy(),
-//  total          => $stats->total_violations(),
-//  avg_complexity => $stats->average_sub_mccabe(),
+    //  subs           => $stats->subs(),
+    //  statements     => $stats->statements(),
+    //  lines_of_perl  => $stats->lines_of_perl(),
+    //  violations     => $stats->violations_by_severity(),
+    //  policies       => $stats->violations_by_policy(),
+    //  total          => $stats->total_violations(),
+    //  avg_complexity => $stats->average_sub_mccabe(),
 
     var dependencies = data.summary.dependency_listing.modules;
     var dependencies_has_pod = data.summary.dependency_listing.has_pod;
@@ -250,8 +251,8 @@ function critique(uri) {
     else if ( complexity > 6 ) {
       $(elem).children().last().addClass('pe-critic-summary-alert');
     }
-         
-        
+    
+    
     $('#pe-critic-module-violations span').each(function(index, severity) {
       $(severity).text('Severity ' + (index + 1) + ' (' + data.summary.violations[index + 1] + ')');
     });
@@ -270,7 +271,7 @@ function critique(uri) {
           pod_class = '';
         }
       }
-                                           
+      
       var li = '<li class="pe-critic-dependency-item' + pod_class + '" >' + dep + '</li>';
       $('#pe-critic-module-dependency-list').append(li);
     });
@@ -290,7 +291,7 @@ function critique(uri) {
     $('body').removeClass('loading');
     
     console.log($xhr, status, error);
-          
+    
     $('.error').css('display', 'inline-flex');
     
     $('#error-message').text(data.error);
@@ -301,25 +302,25 @@ function critique(uri) {
 
 // ########################################################################
 function append_to_table (tr, text) {
-// ########################################################################
+  // ########################################################################
   return $(tr).append('<td>' + text + '</td>');
 }
 
 
 // ########################################################################
 function toggle_children (node) {
-// ########################################################################
+  // ########################################################################
   var divs = $(node).siblings('div');
 
   for (i=0; i<divs.length; i++ ) {
     $(divs[i]).first().toggle();
   }
- 
+  
 }
 
 // ########################################################################
 function clear_context() {
-// ########################################################################
+  // ########################################################################
   
   var selected_module = $('.selected-module');
 

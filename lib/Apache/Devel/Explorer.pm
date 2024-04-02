@@ -87,6 +87,8 @@ sub find_module {
 
   return $module;
 }
+
+# /explorer/repo/{action}/{extra}
 ########################################################################
 sub parse_uri {
 ########################################################################
@@ -95,6 +97,7 @@ sub parse_uri {
   my $uri_path = $EMPTY;
   my $repo     = $EMPTY;
 
+  # special case when pod is not in repo
   if ( $uri =~ /\/explorer\/pod\/(.*)?/xsm ) {
     $uri_path = $uri;
   }
@@ -131,22 +134,20 @@ sub handler {
     );
   }
 
+  my $dispatch = {
+    source   => \&show_source,
+    search   => \&api_search,
+    pod      => \&show_pod,
+    todos    => \&api_todos,
+    markdown => \&show_markdown,
+  };
+
   if ( !$uri_path ) {
     return explorer( $r, explorer => $explorer );
   }
 
   if ( $uri_path =~ /markdown\/([[:digit:]a-f]{32})$/xsm ) {
     return show_markdown( $r, explorer => $explorer, markdown_id => $1 );
-  }
-
-  if ( $uri_path =~ /^source\//xsm ) {
-    my @uri_parts = split /\//xsm, $uri_path;
-
-    my $dispatch = {
-      search => \&api_search,
-      pod    => \&show_pod,
-      todos  => \&api_todos,
-    };
   }
 
   if ( $uri_path =~ /source\/search/xsm ) {
@@ -167,6 +168,15 @@ sub handler {
     return api_todos( $r, explorer => $explorer, critic => $critic );
   }
 
+  if ( $uri_path =~ /source\/lines\/(.+)$/xsm ) {
+    my $id = $explorer->verify_id($1);
+
+    return $NOT_FOUND
+      if !$id;
+
+    return api_source_lines( $r, id => $id, explorer => $explorer );
+  }
+
   if ( $uri_path =~ /source\/(.+)$/xsm ) {
     my $id = $explorer->verify_id($1);
 
@@ -176,8 +186,8 @@ sub handler {
     return show_source( $r, id => $id, explorer => $explorer );
   }
 
-  if ( $uri_path =~ /^source-lines\/(.+)$/xsm ) {
-    return api_source_lines( $r, module => $1, explorer => $explorer );
+  if ( $uri_path =~ /^source\/lines\/(.+)$/xsm ) {
+    return api_source_lines( $r, id => $1, explorer => $explorer );
   }
 
   if ( $uri_path =~ /^critic\/(.+)$/xsm ) {
@@ -226,7 +236,15 @@ sub around_lines {
 
   @range = grep { $_ >= 0 && $_ < @{$source} } @range;
 
-  return [ @{$source}[@range] ];
+  my @around_lines = @{$source}[@range];
+
+  foreach (@around_lines) {
+    s/<pre><tt>(.*?)<\/tt><\/pre>/$1/xsm;
+  }
+
+  dbg around => \@around_lines;
+
+  return \@around_lines;
 }
 
 ########################################################################
@@ -325,10 +343,6 @@ sub api_search {
   my $scripts_only = $req->param('scripts_only');
   my $file_id      = $req->param('file_id');
 
-  dbg
-    module  => $module,
-    file_id => $file_id;
-
   my $source = eval { return slurp_file $explorer->get_file_by_id($file_id); };
 
   if ( !$source || $EVAL_ERROR ) {
@@ -364,7 +378,6 @@ sub api_search {
           $package_name = $file_info->{$id}->{package_name}->[0];
         }
         else {
-          dbg $file_info->{$id};
           $package_name = $file_info->{$id}->{name};
         }
 
@@ -400,7 +413,9 @@ sub api_source_lines {
 
   my $options = get_args(@args);
 
-  my ( $explorer, $module ) = @{$options}{qw(explorer module)};
+  my ( $explorer, $id ) = @{$options}{qw(explorer id)};
+
+  $id = $explorer->verify_id($id);
 
   my $req = Apache2::Request->new($r);
 
@@ -408,7 +423,7 @@ sub api_source_lines {
 
   my $line_number = $req->param('line_number');
 
-  my $file = $explorer->get_file_by_module($module);
+  my $file = $explorer->get_file_by_id($id);
 
   my $source = slurp_file $file;
 
@@ -423,14 +438,16 @@ sub api_source_lines {
     explorer => $explorer,
   );
 
-  my $highlighted_source = $source_explorer->highlight_source_lines();
+  my $highlighted_source = $source_explorer->highlight_source_lines( inputlang => 'perl.lang' );
 
   $highlighted_source = around_lines( $highlighted_source, $lines, $line_number );
 
   # TODO: class names should be a configurable option
   if ($line_number) {
     my $line_to_highlight = -1 + $lines;
-    my $line              = $highlighted_source->[$line_to_highlight];
+
+    my $line = $highlighted_source->[$line_to_highlight];
+
     if ( $line =~ /pe\-critic\-context/xsm ) {
       $line =~ s/pe\-critic\-context/pe-critic-context pe-critic-context-line/xsm;
       $highlighted_source->[$line_to_highlight] = $line;
@@ -943,6 +960,7 @@ sub critique {
     module => $module,
     config => $config,
     source => $source,
+    repo   => $explorer->get_repo,
   );
 
   my $violations = $critic->critique();

@@ -111,7 +111,8 @@ sub highlight_source_lines {
 
   my $options = ref $args[0] ? $args[0] : {@args};
 
-  my ( $file, $source, $module ) = @{$options}{qw(file source)};
+  my ( $file, $source, $inputlang ) = @{$options}{qw(file source inputlang)};
+  $inputlang //= $self->get_inputlang;
 
   my @source = $self->fetch_source;
 
@@ -122,11 +123,11 @@ sub highlight_source_lines {
   my $line_number = 0;
 
   foreach my $line (@source) {
-    $line = $highlighter->highlightString( $line, $self->get_inputlang );
-    $line =~ s/\s*<\![^>]+-->//xsm;
+    $line = $highlighter->highlightString( $line, $inputlang );
+    $line =~ s/\s*<\![^>]+-->\n//xsm;
     chomp $line;
 
-    $line = sprintf '<pre class="pe-critic-context">[%05d] %s', ++$line_number, $line;
+    $line = sprintf '<pre class="pe-critic-context">[%05d] %s</pre>', ++$line_number, $line;
   }
 
   return \@source;
@@ -143,15 +144,15 @@ sub fetch_source {
 
   my $source = $self->get_source;
 
-  return $source
-    if $source;
+  if ( !$source ) {
 
-  die "no file\n"
-    if !$file;
+    die "no file\n"
+      if !$file;
 
-  $source = slurp_file $file;
+    $source = slurp_file $file;
 
-  $self->set_source($source);
+    $self->set_source($source);
+  }
 
   return wantarray ? split /\n/xsm, $source : $source;
 }

@@ -2,10 +2,14 @@
 // (C) Copyright 2024 - TBC Development Group, LLC
 // All rights reserved
 
+var repo;
+
 // #####################################################################
 $(document).ready(function () {
 // #####################################################################
   var line_numbers = {};
+
+  repo = $('#pe-repo').val();
   
   $('.severity').each(function () {
     $(this).addClass('sev-' + $(this).text())
@@ -71,7 +75,7 @@ $(document).ready(function () {
       }
       else {
         var title = $('title').text();
-        var uri = '/explorer/source-lines/' + title + '?lines=5&line_number=' + line_number_text;
+        var uri = '/explorer/' + repo + '/source/lines/' + title + '?lines=5&line_number=' + line_number_text;
         
         $.ajax({
           url: uri
